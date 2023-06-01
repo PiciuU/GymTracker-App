@@ -1,0 +1,16 @@
+@import './base.css';
+
+#app {
+    max-width: 1280px;
+    min-height: 100vh;
+    margin: 0 auto;
+
+    font-weight: normal;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: var(--color-text);
+    text-decoration: none;
+}
