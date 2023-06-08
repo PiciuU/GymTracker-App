@@ -45,6 +45,9 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => 'auth:sanct
 Route::group(['prefix' => 'auth'], function() {
     Route::post('register', [UserController::class, 'register']);
     Route::post('login', [UserController::class, 'login']);
+    Route::get('recover/{hash}', [UserController::class, 'recoverToken']);
+    Route::post('recover', [UserController::class, 'recover']);
+    Route::post('reset', [UserController::class, 'resetPassword']);
 });
 
 Route::get('/setup', function() {

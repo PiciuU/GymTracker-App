@@ -5,9 +5,24 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class UserRequest extends FormRequest
 {
+    protected function failedValidation(Validator $validator)
+    {
+        $response = response()->json([
+            'status' => "Error",
+            'message' => "Validation failed. Please check the following fields:",
+            'data' => $validator->errors(),
+        ], 422);
+
+        throw (new ValidationException($validator, $response))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
+    }
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -48,6 +63,10 @@ class UserRequest extends FormRequest
             return $this->login();
         } elseif ($methodName === 'register') {
             return $this->register();
+        } elseif ($methodName === 'recover') {
+            return $this->recover();
+        } elseif ($methodName === 'resetPassword') {
+            return $this->reset();
         } elseif ($methodName === 'updateName') {
             return $this->updateName();
         } elseif ($methodName === 'updatePassword') {
@@ -83,6 +102,29 @@ class UserRequest extends FormRequest
             'email'=> ['required', 'email', 'unique:users'],
             'password' => ['required'],
             'user_role_id' => ['required', Rule::in([1])],
+        ];
+    }
+
+    /**
+     * Get the validation rules for recover.
+     *
+     * @return array
+     */
+    protected function recover() : array {
+        return [
+            'email'=> ['required', 'email']
+        ];
+    }
+
+    /**
+     * Get the validation rules for reset.
+     *
+     * @return array
+     */
+    protected function reset() : array {
+        return [
+            'hash'=> ['required'],
+            'password' => ['required', 'confirmed'],
         ];
     }
 
@@ -131,6 +173,9 @@ class UserRequest extends FormRequest
         if ($this->isMethod('POST')) {
             $this->merge([
                 'user_role_id' => 1
+            ]);
+            $this->merge([
+                'name' => $this->login
             ]);
         }
         else if ($this->filled('userRoleId')) {

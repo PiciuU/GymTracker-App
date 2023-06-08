@@ -1,20 +1,6 @@
+@import './variables.scss';
+
 :root {
-    --color-text: #ffffff;
-    --color-text-muted-1: rgba(255, 255, 255, 0.87);
-    --color-text-muted-2: rgba(255, 255, 255, 0.6);
-    --color-text-muted-3: rgba(255, 255, 255, 0.38);
-
-    --color-primary: #BB86FC;
-    --color-primary-variant: #3700B3;
-    --color-secondary: #03DAC6;
-
-    --color-overlay: #202020;
-    --color-background: #121212;
-    --color-error: #CF6679;
-
-    --color-on-primary: #000000;
-    --color-on-background: #ffffff;
-
     font-size: 62.5%;
 }
 
@@ -27,7 +13,7 @@
     font-weight: normal;
 }
 
-body {
+html, body {
     min-height: 100vh;
     color: var(--color-text);
     background: var(--color-background);
@@ -37,4 +23,21 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 1.6rem;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    font-weight: normal;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
 }
