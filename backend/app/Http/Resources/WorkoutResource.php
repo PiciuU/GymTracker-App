@@ -29,6 +29,7 @@ class WorkoutResource extends JsonResource
             return [
                 'id' => $this->id,
                 'dayOfWeek' => $this->daysMap[$this->day_of_week],
+                'exercises' => new WorkoutExerciseCollection($this->workoutExercises),
                 'userId' => $this->user_id
             ];
         } else {

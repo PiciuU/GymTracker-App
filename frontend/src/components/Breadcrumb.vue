@@ -1,5 +1,5 @@
 <template>
-    <aside class="breadcrumb" v-if="route.meta">
+    <aside class="breadcrumb" v-if="route.meta.breadcrumb">
         <div class="breadcrumb__list" v-for="(part, index) in parts" :key="index">
             <span class="breadcrumb__link--current" v-if="isLast(index)">{{ part }}</span>
             <router-link class="breadcrumb__link" v-else :to="{name: part}">{{ part }}</router-link>
@@ -29,15 +29,16 @@
 
 <style lang="scss" scoped>
 .breadcrumb {
-    padding-top: 1rem;
+    padding-top: 10px;
     font-size: 1.2rem;
+    margin-bottom: auto;
 
     &__list {
         display: inline-block;
     }
 
     &__divider {
-        margin: 0 0.5rem;
+        margin: 0 5px
     }
 
     &__link {

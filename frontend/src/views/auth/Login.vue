@@ -11,7 +11,7 @@
 
             <label for="password" class="auth__label">Password</label>
             <div class="auth__input-group" :class="{ 'auth__has-error': errors.password }">
-                <input type="text" id="password" class="auth__input" v-model="credentials.password" />
+                <input type="password" id="password" class="auth__input" v-model="credentials.password" />
                 <div v-if="errors.password" class="auth__error-message">{{ errors.password }}</div>
             </div>
 

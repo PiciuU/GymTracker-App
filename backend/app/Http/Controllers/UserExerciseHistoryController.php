@@ -60,12 +60,14 @@ class UserExerciseHistoryController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exerciseHistory = UserExerciseHistory::find($id);
-        else $exerciseHistory = $user->history()->find($id);
+        // if ($user->tokenCan('admin')) $exerciseHistory = UserExerciseHistory::find($id);
+        // else $exerciseHistory = $user->history()->find($id);
 
-        if (!$exerciseHistory) return $this->errorResponse('User exercise history not found.', 404);
+        $exerciseHistoryCollection = new UserExerciseHistoryCollection($user->history()->where('exercise_id', $id)->orderBy('date', 'desc')->get());
 
-        return $this->successResponse('User exercise history found', new UserExerciseHistoryResource($exerciseHistory));
+        if (!$exerciseHistoryCollection) return $this->errorResponse('User exercise history not found.', 404);
+
+        return $this->successResponse('User exercise history found', $exerciseHistoryCollection);
     }
 
     /**

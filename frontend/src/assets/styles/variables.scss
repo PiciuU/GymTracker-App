@@ -21,11 +21,34 @@
     /* Constants */
 
     --heigh-header: 45px;
-
-    /* Breakpoints */
-
-    --breakpoint-mobile: 576px;
-    --breakpoint-small-devices: 768px;
-    --breakpoint-medium-devices: 992px;
-    --breakpoint-large-devices: 1200px;
 }
+
+/* Colors */
+
+$--color-text: #ffffff;
+$--color-text-muted-1: rgba(255, 255, 255, 0.87);
+$--color-text-muted-2: rgba(255, 255, 255, 0.6);
+$--color-text-muted-3: rgba(255, 255, 255, 0.38);
+
+$--color-primary: #BB86FC;
+$--color-primary-variant: #3700B3;
+$--color-secondary: #03DAC6;
+
+$--color-overlay: #202020;
+$--color-background: #121212;
+$--color-success: #4CAF50;
+$--color-error: #CF6679;
+
+$--color-on-primary: #000000;
+$--color-on-background: #ffffff;
+
+/* Constants */
+
+$--header-height: 45px;
+
+/* Breakpoints */
+
+$--breakpoint-mobile: 576px;
+$--breakpoint-small-devices: 768px;
+$--breakpoint-medium-devices: 992px;
+$--breakpoint-large-devices: 1200px;

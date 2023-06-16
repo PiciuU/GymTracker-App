@@ -46,6 +46,7 @@ class ExerciseRequest extends FormRequest
             'description' => ['sometimes', 'required'],
             'muscle_group' => ['sometimes', 'required'],
             'thumbnail_url' => ['sometimes', 'required'],
+            'attachment_url' => ['sometimes', 'required'],
             'user_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'is_public' => ['required','integer', Rule::in([0,1])],
             'is_approved' => ['required','integer', Rule::in([0,1])],
@@ -63,6 +64,7 @@ class ExerciseRequest extends FormRequest
             'description' => ['sometimes'],
             'muscle_group' => ['sometimes'],
             'thumbnail_url' => ['sometimes'],
+            'attachment_url' => ['sometimes'],
             'is_public' => ['sometimes','integer', Rule::in([0,1])],
         ];
 

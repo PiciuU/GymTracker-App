@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/AuthStore';
+import { useDataStore } from '@/stores/DataStore';
 
 export const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,32 +13,64 @@ export const router = createRouter({
                 {
                     name: 'Home',
                     path: '',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/HomeView.vue'),
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Home.vue'),
                     meta: { breadcrumb: '' }
                 },
                 {
                     path: '/workout',
                     name: 'Workout',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutView.vue'),
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutList.vue'),
                     meta: { breadcrumb: 'Home/Workout' }
                 },
                 {
-                    path: 'workout/monday',
-                    name: 'WorkoutDayMonday',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutDayView.vue'),
-                    meta: { breadcrumb: 'Home/Workout/Monday' }
+                    path: 'workout/:day',
+                    name: 'WorkoutItem',
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutItem.vue'),
+                    meta: { breadcrumb: 'Home/Workout/:day' },
+                    beforeEnter: (to, from, next) => {
+                        const dataStore = useDataStore();
+                        const workout = dataStore.workouts.find(w => w.dayOfWeek.toLowerCase() === to.params.day)
+                        if (workout) {
+                            to.meta.breadcrumb = to.meta.breadcrumb.replace(':day', workout.dayOfWeek);
+                            to.meta.workoutId = workout.id;
+                            next();
+                        }
+                        else next('/workout');
+                    },
                 },
                 {
                     name: 'Exercises',
                     path: 'exercises',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutView.vue'),
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Exercises.vue'),
                     meta: { breadcrumb: 'Home/Exercises' }
                 },
                 {
                     name: 'Progress',
                     path: 'progress',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutView.vue'),
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Progress.vue'),
                     meta: { breadcrumb: 'Home/Progress' }
+                },
+                {
+                    name: 'ProgressHistory',
+                    path: 'progress/history',
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/ProgressHistory.vue'),
+                    meta: { breadcrumb: 'Home/Progress/History' }
+                },
+                {
+                    name: 'ProgressHistory',
+                    path: 'progress/history',
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/progress/History.vue'),
+                    meta: { breadcrumb: 'Home/Progress/History' }
+                },
+                {
+                    name: 'ProgressCalculator',
+                    path: 'progress/calculator/:name',
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/progress/Calculator.vue'),
+                    meta: { breadcrumb: 'Home/Progress/Calculator' },
+                    beforeEnter: (to, from, next) => {
+                        to.meta.calculatorType = to.params.name;
+                        next();
+                    },
                 },
             ],
         },

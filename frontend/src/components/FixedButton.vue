@@ -1,14 +1,14 @@
 <template>
     <button class="action-button">
-        <font-awesome-icon icon="fa-solid fa-plus" size="lg" fixed-width />
+        <font-awesome-icon icon="fa-solid fa-plus" size="xl" fixed-width />
     </button>
 </template>
 
 <style lang="scss" scoped>
 .action-button {
-    position: absolute;
-    right: 0;
-    bottom: 0;
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
     width: 50px;
     height: 50px;
     background: var(--color-primary);

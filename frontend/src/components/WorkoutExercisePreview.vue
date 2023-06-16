@@ -1,25 +1,30 @@
 <template>
-    <div class="exercise-item">
-       <div class="exercise-item__thumbnail">
+    <div class="exercise">
+       <div class="exercise__thumbnail">
            <img :src="loadImage(data)"/>
        </div>
-       <div class="exercise-item__description">
-           <div class="exercise-item__title">
+       <div class="exercise__description">
+           <div class="exercise__title">
                 <slot name="title">Unknown</slot>
             </div>
-           <div class="exercise-item__subtitle">
+           <div class="exercise__subtitle">
                 <slot name="subtitle">No data</slot>
             </div>
        </div>
-       <div class="exercise-item__arrowhead">
+       <div class="exercise__arrowhead">
            <font-awesome-icon icon="fa-solid fa-angle-up" rotation="90"/>
        </div>
+       <button class="exercise__delete" v-if="props.editMode" :disabled="props.isLoading">
+            Remove
+       </button>
     </div>
 </template>
 
 <script setup>
-    defineProps({
-        data: { type: Array, required: true, default: [] }
+    const props = defineProps({
+        data: { type: Array, required: true, default: [] },
+        editMode: { type: Boolean, required: false, default: false },
+        isLoading: { type: Boolean, required: false, default: false }
     });
 
     function loadImage(data) {
@@ -32,7 +37,7 @@
             }
         }
         catch(e) {
-            console.log(e);
+            // console.log(e);
             imageName = 'missing';
         }
         return new URL("../assets/images/exercises/" + imageName + ".jpg", import.meta.url).href;
@@ -47,13 +52,54 @@
 </script>
 
 <style lang="scss" scoped>
-.exercise-item {
+.exercise {
     background: var(--color-overlay);
     border-radius: 10px;
     box-shadow: 1px 1px 0px var(--color-secondary);
     cursor: pointer;
     display: flex;
     margin: 5px 0px;
+
+    &__delete {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0,0,0, 0.8);
+        color: var(--color-text);
+        outline: none;
+        border: none;
+        border-radius: 5px 10px 10px 5px;
+        font-weight: bold;
+        font-size: 1.6rem;
+        transition: all 0.25s ease-in-out;
+        text-transform: uppercase;
+        cursor: pointer;
+
+        &:disabled {
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            cursor: wait;
+
+            &:after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 2px solid white;
+                border-top-color: transparent;
+                animation: spin 1s linear infinite;
+            }
+        }
+    }
 
     &__thumbnail {
         height: 65px;
@@ -91,5 +137,10 @@
         text-align: center;
         width: 50px;
     }
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 </style>

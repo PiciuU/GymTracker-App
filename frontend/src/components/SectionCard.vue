@@ -25,24 +25,26 @@
 
 <style lang="scss" scoped>
 .card {
-    background: var(--color-overlay);
-    padding: .5rem;
+    max-width: 400px;
+    width: 100%;
+    border: 5px solid $--color-overlay;
+    overflow: hidden;
 
     &__figure {
+        display: flex;
         align-items: center;
+        justify-content: center;
         background-blend-mode: multiply;
         background-color: grey;
         background-position: center;
-        background-size: 100%;
-        display: flex;
-        height: 150px;
-        justify-content: center;
-        transition: all .25s ease-in-out;
+        background-size: cover;
+        min-height: 150px;
+        height: 100%;
+        transition: all 0.25s ease-in-out;
     }
 
 
     &__title {
-        color: var(--color-text);
         font-size: 2.5rem;
         font-weight: bold;
         letter-spacing: 1rem;
@@ -53,13 +55,20 @@
     }
 
     &:hover &__figure {
-        background-size: 125%;
+        transform: scale(1.25);
     }
 
     &:hover &__title {
         font-size: 2rem;
-        letter-spacing: 2rem;
-        margin-right: -2rem; /* Avoid letter spacing gap for last character */
+        letter-spacing: 1.5rem;
+        margin-right: -1.5rem; /* Avoid letter spacing gap for last character */
+    }
+}
+
+@media screen and (min-width: $--breakpoint-large-devices) {
+    .card {
+        height: 250px;
+        flex-basis: 33.33%;
     }
 }
 </style>

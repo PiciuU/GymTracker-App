@@ -5,13 +5,13 @@
         <form class="auth__form" @submit.prevent="submitForm" v-if="isRecovered.status == false">
                 <label for="password" class="auth__label">New Password</label>
                 <div class="auth__input-group" :class="{ 'auth__has-error': errors.password }">
-                    <input type="text" id="password" class="auth__input" v-model="credentials.password" />
+                    <input type="password" id="password" class="auth__input" v-model="credentials.password" />
                     <div v-if="errors.password" class="auth__error-message">{{ errors.password }}</div>
                 </div>
 
                 <label for="passwordConfirmation" class="auth__label">Confirm Password</label>
                 <div class="auth__input-group" :class="{ 'auth__has-error': errors.passwordConfirmation }">
-                    <input type="text" id="passwordConfirmation" class="auth__input" v-model="credentials.passwordConfirmation" />
+                    <input type="password" id="passwordConfirmation" class="auth__input" v-model="credentials.passwordConfirmation" />
                     <div v-if="errors.passwordConfirmation" class="auth__error-message">{{ errors.passwordConfirmation }}</div>
                 </div>
 

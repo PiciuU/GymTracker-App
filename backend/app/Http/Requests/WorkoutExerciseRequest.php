@@ -51,8 +51,8 @@ class WorkoutExerciseRequest extends FormRequest
         return [
             'sets' => ['sometimes','required','integer'],
             'reps' => ['sometimes','required','integer'],
-            'rest_time' => ['sometimes','required','integer'],
-            'weight' => ['sometimes','required', 'numeric', 'regex:/^\d{0,6}(\.\d{1,2})?$/'],
+            'rest_time' => ['sometimes', 'nullable', 'integer'],
+            'weight' => ['sometimes', 'nullable', 'numeric', 'regex:/^\d{0,6}(\.\d{1,2})?$/'],
             'workout_id' => ['required', 'integer', Rule::exists('workouts', 'id')],
             'exercise_id' => ['required', 'integer', Rule::exists('exercises', 'id')]
         ];
@@ -129,8 +129,18 @@ class WorkoutExerciseRequest extends FormRequest
         }
 
         if ($this->filled('restTime')) {
+            $restTime = $this->restTime;
+
+            if (preg_match('/^\d{2}:\d{2}$/', $restTime)) {
+                $parts = explode(':', $restTime);
+                $minutes = $parts[0];
+                $seconds = $parts[1];
+
+                $restTime = ($minutes * 60) + $seconds;
+            }
+
             $this->merge([
-                'rest_time' => $this->restTime
+                'rest_time' => $restTime
             ]);
         }
     }

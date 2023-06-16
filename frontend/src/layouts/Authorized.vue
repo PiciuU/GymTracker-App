@@ -6,9 +6,7 @@
             <Breadcrumb />
 
             <router-view v-slot="{ Component }">
-                <keep-alive>
-                    <component :is="Component"></component>
-                </keep-alive>
+                <component :is="Component"></component>
             </router-view>
         </div>
 
@@ -26,19 +24,22 @@
 <script setup>
     import { onBeforeMount, ref } from 'vue';
     import { useAuthStore } from '@/stores/AuthStore';
+    import { useDataStore } from '@/stores/DataStore';
 
     import TheHeader from '@/components/common/TheHeader.vue';
     import Breadcrumb from '@/components/Breadcrumb.vue';
 
+    const dataStore = useDataStore();
     const authStore = useAuthStore();
     let isFetching = ref(false);
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
         isFetching.value = true;
         authStore.fetchUser();
+
+        await dataStore.fetchData();
         isFetching.value = false;
     });
-
 </script>
 
 <style lang="scss" scoped>
@@ -46,6 +47,12 @@ main {
     display: flex;
     flex: 1;
     padding: 0px 20px;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .loading-container {

@@ -17,7 +17,7 @@ class WorkoutController extends Controller
      */
     public function index()
     {
-        $workouts = new WorkoutCollection(auth()->user()->workouts);
+        $workouts = new WorkoutCollection(auth()->user()->workouts->sortBy('day_of_week'));
         return $this->successResponse('Workouts plan list found', $workouts);
     }
 

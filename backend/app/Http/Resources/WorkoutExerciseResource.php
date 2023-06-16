@@ -15,41 +15,43 @@ class WorkoutExerciseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if ($this->rest_time === null) {
+            $formattedTime = null;
+        } else {
+            $seconds = $this->rest_time;
+            $minutes = floor($seconds / 60);
+            $seconds = $seconds % 60;
+            $formattedTime = sprintf('%02d:%02d', $minutes, $seconds);
+        }
+
         if ($request->user()->tokenCan('admin')) {
             return [
-                'id' => $this->id,
-                'workoutId' => $this->workout_id,
-                'exercise' => [
-                    'id' => $this->exercise_id,
-                    'name' => $this->exercise->name,
-                    'description' => $this->exercise->description,
-                    'muscleGroup' => $this->exercise->muscle_group,
-                    'thumbnailUrl' => $this->exercise->thumbnail_url,
-                    'attachmentUrl' => $this->exercise->attachment_url,
-                    'userId' => $this->exercise->user_id,
-                    'isPublic' => $this->exercise->is_public,
-                    'isApproved' => $this->exercise->is_approved,
-                    'sets' => $this->sets,
-                    'reps' => $this->reps,
-                    'restTime' => $this->rest_time,
-                    'weight' => $this->weight
-                ],
+                'id' => $this->exercise_id,
+                'name' => $this->exercise->name,
+                'description' => $this->exercise->description,
+                'muscleGroup' => $this->exercise->muscle_group,
+                'thumbnailUrl' => $this->exercise->thumbnail_url,
+                'attachmentUrl' => $this->exercise->attachment_url,
+                'userId' => $this->exercise->user_id,
+                'isPublic' => $this->exercise->is_public,
+                'isApproved' => $this->exercise->is_approved,
+                'sets' => $this->sets,
+                'reps' => $this->reps,
+                'restTime' => $formattedTime,
+                'weight' => $this->weight
             ];
         }
         else {
             return [
-                'id' => $this->id,
-                'exercise' => [
-                    'name' => $this->exercise->name,
-                    'description' => $this->exercise->description,
-                    'muscleGroup' => $this->exercise->muscle_group,
-                    'thumbnailUrl' => $this->exercise->thumbnail_url,
-                    'attachmentUrl' => $this->exercise->attachment_url,
-                    'sets' => $this->sets,
-                    'reps' => $this->reps,
-                    'restTime' => $this->rest_time,
-                    'weight' => $this->weight
-                ],
+                'name' => $this->exercise->name,
+                'description' => $this->exercise->description,
+                'muscleGroup' => $this->exercise->muscle_group,
+                'thumbnailUrl' => $this->exercise->thumbnail_url,
+                'attachmentUrl' => $this->exercise->attachment_url,
+                'sets' => $this->sets,
+                'reps' => $this->reps,
+                'restTime' => $formattedTime,
+                'weight' => $this->weight
             ];
         }
     }
