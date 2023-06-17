@@ -17,14 +17,20 @@ export const router = createRouter({
                     meta: { breadcrumb: '' }
                 },
                 {
-                    path: '/workout',
+                    name: 'Settings',
+                    path: '/settings',
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Settings.vue'),
+                    meta: { breadcrumb: 'Home/Settings' }
+                },
+                {
                     name: 'Workout',
+                    path: '/workout',
                     component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutList.vue'),
                     meta: { breadcrumb: 'Home/Workout' }
                 },
                 {
-                    path: 'workout/:day',
                     name: 'WorkoutItem',
+                    path: 'workout/:day',
                     component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutItem.vue'),
                     meta: { breadcrumb: 'Home/Workout/:day' },
                     beforeEnter: (to, from, next) => {

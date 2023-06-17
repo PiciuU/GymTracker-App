@@ -69,6 +69,8 @@ class UserRequest extends FormRequest
             return $this->reset();
         } elseif ($methodName === 'updateName') {
             return $this->updateName();
+        } elseif ($methodName === 'updateMail') {
+            return $this->updateMail();
         } elseif ($methodName === 'updatePassword') {
             return $this->updatePassword();
         }
@@ -151,6 +153,17 @@ class UserRequest extends FormRequest
     protected function updateName() : array {
         return [
             'name' => ['sometimes', 'required'],
+        ];
+    }
+
+    /**
+     * Get the validation rules for updating the user's mail.
+     *
+     * @return array
+     */
+    protected function updateMail() : array {
+        return [
+            'email' => ['sometimes', 'required', 'email', 'unique:users'],
         ];
     }
 

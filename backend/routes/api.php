@@ -30,9 +30,10 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => 'auth:sanct
 
         Route::get('user', [UserController::class, 'userData']);
         Route::put('user/name', [UserController::class, 'updateName']);
+        Route::put('user/mail', [UserController::class, 'updateMail']);
         Route::put('user/password', [UserController::class, 'updatePassword']);
 
-        Route::post('logout', [UserController::class, 'logout']);
+        Route::get('logout', [UserController::class, 'logout']);
     });
 
     Route::apiResource('workout', WorkoutController::class);

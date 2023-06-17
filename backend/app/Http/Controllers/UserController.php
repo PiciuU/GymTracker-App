@@ -252,6 +252,11 @@ class UserController extends Controller
     public function updateMail(UserRequest $request)
     {
        // Implement a similar function to updateName, but also send an email to the old email address notifying about the change.
+       $user = auth()->user();
+
+        if(!$user->update($request->validated())) return $this->errorResponse('An error occurred while updating the user data, try again later', 500);
+
+        return $this->successResponse('User data has been successfully updated', new UserResource($user));
     }
 
     /**
