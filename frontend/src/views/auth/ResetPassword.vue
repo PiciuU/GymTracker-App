@@ -1,32 +1,36 @@
 <template>
-    <div class="auth-container">
-        <h1 class="auth__title">Recover your Account</h1>
+    <div class="container">
+        <h1>Recover your Account</h1>
 
-        <form class="auth__form" @submit.prevent="submitForm" v-if="isRecovered.status == false">
-                <label for="password" class="auth__label">New Password</label>
-                <div class="auth__input-group" :class="{ 'auth__has-error': errors.password }">
-                    <input type="password" id="password" class="auth__input" v-model="credentials.password" />
-                    <div v-if="errors.password" class="auth__error-message">{{ errors.password }}</div>
+        <form class="form" @submit.prevent="submitForm" v-if="isRecovered.status === false">
+            <div class="form__group">
+                <label for="password">New Password</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.password }">
+                    <input type="password" id="password" v-model="credentials.password" />
+                    <p v-if="errors.password">{{ errors.password }}</p>
                 </div>
+            </div>
 
-                <label for="passwordConfirmation" class="auth__label">Confirm Password</label>
-                <div class="auth__input-group" :class="{ 'auth__has-error': errors.passwordConfirmation }">
-                    <input type="password" id="passwordConfirmation" class="auth__input" v-model="credentials.passwordConfirmation" />
-                    <div v-if="errors.passwordConfirmation" class="auth__error-message">{{ errors.passwordConfirmation }}</div>
+            <div class="form__group">
+                <label for="passwordConfirmation">Confirm Password</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.passwordConfirmation }">
+                    <input type="password" id="passwordConfirmation" v-model="credentials.passwordConfirmation" />
+                    <p v-if="errors.passwordConfirmation">{{ errors.passwordConfirmation }}</p>
                 </div>
+            </div>
 
-                <button class="auth__button" :disabled='authStore.isLoading'>Reset Password</button>
-                <div v-if="errors.critical" class="auth__critical-error-message">{{ errors.critical }}</div>
+            <button :disabled='authStore.isLoading'>Reset Password</button>
+            <div v-if="errors.critical" class="form__error"><p>{{ errors.critical }}</p></div>
         </form>
-        <div class="auth__message-box" v-else>
-            <div class="auth__message">{{ isRecovered.message }}</div>
+        <div class="form__success" v-else>
+            <p>{{ isRecovered.message }}</p>
             <router-link to="/login">
-                <button class="auth__success">Back to login</button>
+                <button>Back to login</button>
             </router-link>
         </div>
 
-        <div class="auth__options">
-            <div class="auth__hint">Remembered your password? <router-link to="/login">Sign in here.</router-link></div>
+        <div class="form__hint">
+            <p>Remembered your password? <router-link to="/login">Sign in here.</router-link></p>
         </div>
     </div>
 </template>
@@ -45,9 +49,9 @@
         passwordConfirmation: '',
     });
 
-    const errors = ref('');
+    const errors = ref({});
 
-    let isRecovered = reactive({
+    const isRecovered = reactive({
         status: false,
         message: ''
     });
@@ -79,5 +83,8 @@
                 }
             })
     };
-
 </script>
+
+<style lang="scss" scoped>
+	@import '@/assets/styles/forms.scss';
+</style>

@@ -18,13 +18,13 @@
                 </div>
                 <div class="menu__user">
                     <div class="menu__username">
-                        Hello <span>{{ authStore.user.login }}</span>
+                        <p>Hello <span>{{ authStore.user.login }}</span></p>
                     </div>
                     <div class="menu__options">
                         <router-link to="/settings" @click="handleAction">
                             Settings
                         </router-link>
-                        <router-link to="#" @click="authStore.logout()">
+                        <router-link to="#" @click="handleLogout">
                             Logout
                         </router-link>
                     </div>
@@ -45,6 +45,11 @@
     const handleAction = () => {
         isExpanded.value = !isExpanded.value;
         document.body.classList.toggle('disableScroll');
+    };
+
+    const handleLogout = () => {
+        handleAction();
+        authStore.logout();
     };
 </script>
 

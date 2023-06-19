@@ -1,26 +1,28 @@
 <template>
-    <div class="auth-container">
-        <h1 class="auth__title">Recover your Account</h1>
+    <div class="container">
+        <h1>Recover your Account</h1>
 
-        <form class="auth__form" @submit.prevent="submitForm" v-if="isRecovered.status == false">
-                <label for="email" class="auth__label">Email</label>
-                <div class="auth__input-group" :class="{ 'auth__has-error': errors.email }">
-                    <input type="email" id="email" class="auth__input" v-model="credentials.email" />
-                    <div v-if="errors.email" class="auth__error-message">{{ errors.email }}</div>
+        <form class="form" @submit.prevent="submitForm" v-if="isRecovered.status === false">
+            <div class="form__group">
+                <label for="email">Email</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.email }">
+                    <input type="email" id="email" v-model="credentials.email" />
+                    <p v-if="errors.email">{{ errors.email }}</p>
                 </div>
+            </div>
 
-                <button class="auth__button" :disabled='authStore.isLoading'>Recover Password</button>
-                <div v-if="errors.critical" class="auth__critical-error-message">{{ errors.critical }}</div>
+            <button :disabled='authStore.isLoading'>Recover Password</button>
+            <div v-if="errors.critical" class="form__error"><p>{{ errors.critical }}</p></div>
         </form>
-        <div class="auth__message-box" v-else>
-            <div class="auth__message">{{ isRecovered.message }}</div>
+        <div class="form__success" v-else>
+            <p>{{ isRecovered.message }}</p>
             <router-link to="/login">
-                <button class="auth__success">Back to login</button>
+                <button>Back to login</button>
             </router-link>
         </div>
 
-        <div class="auth__options">
-                <div class="auth__hint">Remembered your password? <router-link to="/login">Sign in here.</router-link></div>
+        <div class="form__hint">
+            <p>Remembered your password? <router-link to="/login">Sign in here.</router-link></p>
         </div>
     </div>
 </template>
@@ -35,9 +37,9 @@
         email: ''
     });
 
-    const errors = ref('');
+    const errors = ref({});
 
-    let isRecovered = reactive({
+    const isRecovered = reactive({
         status: false,
         message: ''
     });
@@ -67,5 +69,8 @@
                 }
             })
     };
-
 </script>
+
+<style lang="scss" scoped>
+	@import '@/assets/styles/forms.scss';
+</style>

@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 import ApiService from '@/services/api.service';
 import { setLocalStorage, getLocalStorage, deleteLocalStorage } from '@/services/storage.service';
 
+import { useAuthStore as authStore } from '@/stores/AuthStore';
+
 export const useDataStore = defineStore('dataStore', {
     state: () => ({
         workouts: [],
@@ -12,6 +14,25 @@ export const useDataStore = defineStore('dataStore', {
     getters: {
         getWorkouts: (state) => state.workouts,
         getExercises: (state) => state.exercises,
+        getGroupedExercises: (state) => {
+            const groups = {};
+            state.exercises.forEach((exercise) => {
+                if (!groups[exercise.muscleGroup]) {
+                    groups[exercise.muscleGroup] = {
+                    muscleGroup: exercise.muscleGroup,
+                    items: [],
+                    };
+                }
+                groups[exercise.muscleGroup].items.push(exercise);
+            });
+
+            return Object.values(groups).sort((a, b) => {
+                if (a.muscleGroup < b.muscleGroup) return -1;
+                if (a.muscleGroup > b.muscleGroup) return 1;
+                return 0;
+            });
+        },
+        getUserExercises: (state) => state.exercises.filter(exercise => exercise.userId === authStore().user.id),
         isLoading: (state) => state.loading,
         availableDaysOfWeek: (state) => {
             const workouts = state.workouts;
@@ -181,6 +202,18 @@ export const useDataStore = defineStore('dataStore', {
             try {
                 this.loading = true;
                 const response = await ApiService.put(`/history/${payload.exerciseId}`, payload);
+                return Promise.resolve(response.data);
+            }
+            catch (error) {
+                return Promise.reject(error.data);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async deleteExerciseHistory(id) {
+            try {
+                this.loading = true;
+                const response = await ApiService.delete(`/history/${id}`);
                 return Promise.resolve(response.data);
             }
             catch (error) {

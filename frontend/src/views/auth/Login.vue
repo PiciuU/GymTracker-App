@@ -1,27 +1,31 @@
 <template>
-    <div class="auth-container">
-        <h1 class="auth__title">Welcome back!</h1>
+    <div class="container">
+        <h1>Welcome back!</h1>
 
-        <form class="auth__form" @submit.prevent="submitForm">
-            <label for="username" class="auth__label">Username</label>
-            <div class="auth__input-group" :class="{ 'auth__has-error': errors.login }">
-                <input type="text" id="username" class="auth__input" v-model="credentials.login" />
-                <div v-if="errors.login" class="auth__error-message">{{ errors.login }}</div>
+        <form class="form" @submit.prevent="submitForm">
+            <div class="form__group">
+                <label for="login">Username</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.login }">
+                    <input type="text" id="login" v-model="credentials.login" />
+                    <p v-if="errors.login">{{ errors.login }}</p>
+                </div>
             </div>
 
-            <label for="password" class="auth__label">Password</label>
-            <div class="auth__input-group" :class="{ 'auth__has-error': errors.password }">
-                <input type="password" id="password" class="auth__input" v-model="credentials.password" />
-                <div v-if="errors.password" class="auth__error-message">{{ errors.password }}</div>
+            <div class="form__group">
+                <label for="password">Password</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.password }">
+                    <input type="password" id="password" v-model="credentials.password" />
+                    <p v-if="errors.password">{{ errors.password }}</p>
+                </div>
             </div>
 
-            <button class="auth__button" :disabled='authStore.isLoading'>Login</button>
-            <div v-if="errors.critical" class="auth__critical-error-message">{{ errors.critical }}</div>
+            <button :disabled='authStore.isLoading'>Login</button>
+            <div v-if="errors.critical" class="form__error"><p>{{ errors.critical }}</p></div>
         </form>
 
-        <div class="auth__options">
-            <div class="auth__hint">Don't have an account? <router-link to="/register">Sign up here.</router-link></div>
-            <div class="auth__hint">Forgot your password? <router-link to="/recover-password">Reset it here.</router-link></div>
+        <div class="form__hint">
+            <p>Don't have an account? <router-link to="/register">Sign up here.</router-link></p>
+            <p>Forgot your password? <router-link to="/recover-password">Reset it here.</router-link></p>
         </div>
     </div>
 </template>
@@ -37,7 +41,7 @@
         password: ''
     });
 
-    const errors = ref('');
+    const errors = ref({});
 
     const submitForm = () => {
         errors.value = {};
@@ -62,3 +66,7 @@
             })
     };
 </script>
+
+<style lang="scss" scoped>
+	@import '@/assets/styles/forms.scss';
+</style>

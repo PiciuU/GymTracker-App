@@ -1,28 +1,32 @@
 <template>
-    <div class="workout-container">
-        <div class="workout">
-            <div class="workout__group">
-                <div class="workout__label">Your exercises</div>
-                <div class="workout__items">
-                    <WorkoutExercisePreview v-for="exercise in filteredExercises" :key="exercise.id" :data="[exercise.muscleGroup, exercise.name]" @click="handleClick(exercise)">
+    <div class="container">
+        <div class="section">
+            <div class="section__group">
+                <div class="group__label">
+                    <p>Your exercises</p>
+                </div>
+                <div class="group__items">
+                    <ExercisePreview v-for="exercise in dataStore.getUserExercises" :key="exercise.id" :image="exercise.attachmentUrl" @click="handleClick(exercise)">
                         <template v-slot:title>{{ exercise.name }}</template>
                         <template v-slot:subtitle>Targets {{ exercise.muscleGroup.toLowerCase() }}</template>
-                    </WorkoutExercisePreview>
+                    </ExercisePreview>
                 </div>
             </div>
 
-            <div class="workout__group">
-                <div class="workout__label">All exercises</div>
-                <div class="workout__items">
-                    <WorkoutExercisePreview v-for="exercise in dataStore.exercises" :key="exercise.id" :data="[exercise.muscleGroup, exercise.name]" @click="handleClick(exercise)">
+            <div class="section__group">
+                <div class="group__label">
+                    <p>All exercises</p>
+                </div>
+                <div class="group__items">
+                    <ExercisePreview v-for="exercise in dataStore.getExercises" :key="exercise.id" :image="exercise.attachmentUrl" @click="handleClick(exercise)">
                         <template v-slot:title>{{ exercise.name }}</template>
                         <template v-slot:subtitle>Targets {{ exercise.muscleGroup.toLowerCase() }}</template>
-                    </WorkoutExercisePreview>
+                    </ExercisePreview>
                 </div>
             </div>
         </div>
 
-        <ActionButton @click="isModalVisible = true"/>
+        <FixedButton @click="isModalVisible = true"/>
 
         <ModalAddExercise v-if="isModalVisible" @close="isModalVisible = false"/>
 
@@ -31,24 +35,18 @@
 </template>
 
 <script setup>
-    import { ref, computed } from 'vue';
-    import { useAuthStore } from '@/stores/AuthStore';
+    import { ref } from 'vue';
     import { useDataStore } from '@/stores/DataStore';
     import ModalAddExercise from '@/components/ModalAddExercise.vue';
     import ModalGetExercise from '@/components/ModalGetExercise.vue';
-    import WorkoutExercisePreview from "@/components/WorkoutExercisePreview.vue";
-    import ActionButton from "@/components/FixedButton.vue";
+    import ExercisePreview from "@/components/ExercisePreview.vue";
+    import FixedButton from "@/components/FixedButton.vue";
 
-    const authStore = useAuthStore();
     const dataStore = useDataStore();
 
-    let selectedExercise = ref(null);
-    let isModalVisible = ref(false);
-    let isDetailsVisible = ref(false);
-
-    const filteredExercises = computed(() => {
-        return dataStore.exercises.filter(exercise => exercise.userId === authStore.user.id);
-    });
+    const selectedExercise = ref(null);
+    const isModalVisible = ref(false);
+    const isDetailsVisible = ref(false);
 
     function handleClick(item) {
         selectedExercise.value = item;
@@ -57,65 +55,49 @@
 </script>
 
 <style lang="scss" scoped>
-    .card-container {
-        width: 100%;
-        height: 100%;
+    .container {
+        align-content: center;
+        align-items: center;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        align-content: center;
         gap: 50px;
-        padding: 20px 0px;
-    }
-
-    @media screen and (min-width: $--breakpoint-large-devices) {
-        .card-container {
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-    }
-
-    .workout-container {
-        width: 100%;
         height: 100%;
-        display: flex;
-        flex-direction: column;
         justify-content: center;
-        align-items: center;
-        align-content: center;
-        gap: 50px;
         padding: 20px 0px;
+        width: 100%;
     }
 
-
-    .workout {
+    .section {
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
+        gap: 10px;
         max-width: 600px;
         width: 100%;
-        gap: 10px;
 
-        &__label {
-            display: inline-flex;
-            margin-bottom: 15px;
+        &__group {
+            .group {
+                &__label {
+                    display: inline-flex;
+                    margin-bottom: 15px;
 
-            &:after {
-                background: var(--color-primary);
-                bottom: -5px;
-                content: '';
-                height: 1px;
-                left: 0;
-                position: absolute;
-                width: 150%;
+                    &:after {
+                        background: var(--color-primary);
+                        bottom: -5px;
+                        content: '';
+                        height: 1px;
+                        left: 0;
+                        position: absolute;
+                        width: 150%;
+                    }
+                }
+
+                &__items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                }
             }
-        }
-
-        &__items {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
         }
     }
 </style>

@@ -25,7 +25,7 @@ export const router = createRouter({
                 {
                     name: 'Workout',
                     path: '/workout',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/WorkoutList.vue'),
+                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Workout.vue'),
                     meta: { breadcrumb: 'Home/Workout' }
                 },
                 {
@@ -55,12 +55,6 @@ export const router = createRouter({
                     path: 'progress',
                     component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/Progress.vue'),
                     meta: { breadcrumb: 'Home/Progress' }
-                },
-                {
-                    name: 'ProgressHistory',
-                    path: 'progress/history',
-                    component: () => import(/* webpackChunkName: "group-authorized" */ '@/views/ProgressHistory.vue'),
-                    meta: { breadcrumb: 'Home/Progress/History' }
                 },
                 {
                     name: 'ProgressHistory',

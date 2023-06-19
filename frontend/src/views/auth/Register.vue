@@ -1,32 +1,38 @@
 <template>
-    <div class="auth-container">
-        <h1 class="auth__title">Create an Account</h1>
+    <div class="container">
+        <h1>Create an Account</h1>
 
-        <form class="auth__form" @submit.prevent="submitForm">
-            <label for="email" class="auth__label">Email</label>
-            <div class="auth__input-group" :class="{ 'auth__has-error': errors.email }">
-                <input type="email" id="email" class="auth__input" v-model="credentials.email" />
-                <div v-if="errors.email" class="auth__error-message">{{ errors.email }}</div>
+        <form class="form" @submit.prevent="submitForm">
+            <div class="form__group">
+                <label for="email">Email</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.email }">
+                    <input type="email" id="email" v-model="credentials.email" />
+                    <p v-if="errors.email">{{ errors.email }}</p>
+                </div>
             </div>
 
-            <label for="username" class="auth__label">Username</label>
-            <div class="auth__input-group" :class="{ 'auth__has-error': errors.login }">
-                <input type="text" id="username" class="auth__input" v-model="credentials.login" />
-                <div v-if="errors.login" class="auth__error-message">{{ errors.login }}</div>
+           <div class="form__group">
+                <label for="login">Username</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.login }">
+                    <input type="text" id="login" v-model="credentials.login" />
+                    <p v-if="errors.login">{{ errors.login }}</p>
+                </div>
             </div>
 
-            <label for="password" class="auth__label">Password</label>
-            <div class="auth__input-group" :class="{ 'auth__has-error': errors.password }">
-                <input type="password" id="password" class="auth__input" v-model="credentials.password" />
-                <div v-if="errors.password" class="auth__error-message">{{ errors.password }}</div>
+            <div class="form__group">
+                <label for="password">Password</label>
+                <div class="form__input-group-with-error" :class="{ 'form__input-group-has-error': errors.password }">
+                    <input type="password" id="password" v-model="credentials.password" />
+                    <p v-if="errors.password">{{ errors.password }}</p>
+                </div>
             </div>
 
-            <button class="auth__button" :disabled='authStore.isLoading'>Register</button>
-            <div v-if="errors.critical" class="auth__critical-error-message">{{ errors.critical }}</div>
+            <button :disabled='authStore.isLoading'>Register</button>
+            <div v-if="errors.critical" class="form__error"><p>{{ errors.critical }}</p></div>
         </form>
 
-        <div class="auth__options">
-            <div class="auth__hint">Already have an account? <router-link to="/login">Sign in here.</router-link></div>
+        <div class="form__hint">
+            <p>Already have an account? <router-link to="/login">Sign in here.</router-link></p>
         </div>
     </div>
 </template>
@@ -43,7 +49,7 @@
         password: ''
     });
 
-    const errors = ref('');
+    const errors = ref({});
 
     const submitForm = () => {
         errors.value = {};
@@ -70,5 +76,8 @@
                 }
             })
     };
-
 </script>
+
+<style lang="scss" scoped>
+	@import '@/assets/styles/forms.scss';
+</style>

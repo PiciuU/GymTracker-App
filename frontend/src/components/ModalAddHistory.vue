@@ -1,40 +1,37 @@
 <template>
     <div class="modal-overlay" @click="$emit('close')"></div>
     <div class="modal">
-        <div class="modal__close" @click="$emit('close')">
-            <font-awesome-icon icon="fa-solid fa-xmark" size="lg" />
-        </div>
         <div class="modal__header">
-            <div class="modal__title">
+            <div class="header__close" @click="$emit('close')">
+                <font-awesome-icon icon="xmark"/>
+            </div>
+            <div class="header__title">
                 {{ mode == 'add' ? "Add new Entry" : "Edit entry" }}
             </div>
-            <div class="modal__subtitle">
+            <div class="header__subtitle">
                 Fill in the details below to store a entry for exercise history.
             </div>
         </div>
         <div class="modal__content">
-            <form class="modal__form" id="modalForm" @submit.prevent="submitForm">
-                <div class="modal__group">
-                    <div class="modal__label">
-                        Enter weight:
-                    </div>
-                    <div class="modal__input-group">
-                        <input type="number" class="modal__input" v-model="formData.weight" placeholder="Weight (kg)" required/>
+            <form class="form form--alternative" id="modalForm" @submit.prevent="submitForm">
+                <div class="form__group">
+                    <label for="weight">Enter weight: </label>
+                    <div class="form__input-group">
+                        <input type="text" id="weight" v-model="formData.weight" placeholder="Weight (kg)" required/>
                     </div>
                 </div>
-                <div class="modal__group">
-                    <div class="modal__label">
-                        Enter date:
-                    </div>
-                    <div class="modal__input-group">
-                        <input type="date" class="modal__input" v-model="formData.date" placeholder="Date" required/>
+
+                <div class="form__group">
+                    <label for="date">Enter date: </label>
+                    <div class="form__input-group">
+                        <input type="date" id="date" v-model="formData.date" placeholder="Date" required/>
                     </div>
                 </div>
             </form>
         </div>
         <div class="modal__footer">
-            <div v-if="error" class="modal__error">{{ error }}</div>
-            <button class="modal__button" form="modalForm" :disabled='dataStore.isLoading'>
+            <div v-if="error" class="footer__error">{{ error }}</div>
+            <button class="footer__button" form="modalForm" :disabled='dataStore.isLoading'>
                 {{ mode == 'add' ? "Add Entry" : "Edit entry" }}
             </button>
         </div>
@@ -45,13 +42,7 @@
     import { ref, reactive, onMounted, onUnmounted } from 'vue';
     import { useDataStore } from '@/stores/DataStore';
 
-    onMounted(() => {
-        document.body.classList.add('disableScroll');
-        if (props.historyEntry) {
-            formData.weight = props.historyEntry.weight;
-            formData.date = props.historyEntry.date;
-        }
-    });
+    onMounted(() => document.body.classList.add('disableScroll'));
 
     onUnmounted(() => document.body.classList.remove('disableScroll'));
 
@@ -61,14 +52,14 @@
 
     const props = defineProps({
         mode: { type: String, required: true, default: 'add' },
-        exercise: { type: Object, required: true, default: '{}' },
-        historyEntry: { type: Object, required: false, default: null },
+        exercise: { type: Object, required: true, default: {} },
+        historyEntry: { type: Object, required: false, default: {} },
     });
 
     const formData = reactive({
         exerciseId: props.exercise.id,
-        weight: null,
-        date: null,
+        weight: props.historyEntry?.weight ?? null,
+        date: props.historyEntry?.date ?? null,
     });
 
     const error = ref('');
@@ -77,24 +68,20 @@
         if (props.mode === 'add') {
             dataStore.addExerciseHistory(formData)
                 .then((entry) => {
-                    console.log('THEN: ', entry);
                     emit('close');
                     emit('add', entry);
                 })
                 .catch((e) => {
-                    console.log(e);
                     error.value = e.message
                 })
         }
         else {
             dataStore.updateExerciseHistory(formData)
                 .then((entry) => {
-                    console.log('THEN: ', entry);
                     emit('close');
                     emit('update', entry);
                 })
                 .catch((e) => {
-                    console.log(e);
                     error.value = e.message
                 })
         }
@@ -102,5 +89,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '@/assets/styles/modal.scss';
+    @import '@/assets/styles/forms.scss';
+    @import '@/assets/styles/modals.scss';
 </style>

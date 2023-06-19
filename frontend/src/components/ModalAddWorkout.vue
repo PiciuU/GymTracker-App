@@ -1,35 +1,35 @@
 <template>
     <div class="modal-overlay" @click="$emit('close')"></div>
     <div class="modal">
-        <div class="modal__close" @click="$emit('close')">
-            <font-awesome-icon icon="fa-solid fa-xmark" size="lg" />
-        </div>
         <div class="modal__header">
-            <div class="modal__title">
+            <div class="header__close" @click="$emit('close')">
+                <font-awesome-icon icon="xmark"/>
+            </div>
+            <div class="header__title">
                 Create new workout
             </div>
-            <div class="modal__subtitle">
+            <div class="header__subtitle">
                 Choose a day of the week for your workout plan.
             </div>
         </div>
         <div class="modal__content">
-            <form class="modal__form" id="modalForm" @submit.prevent="submitForm">
-                <div class="modal__group">
-                    <div class="modal__label">
-                        Select a day of the week:
+            <form class="form form--alternative" id="modalForm" @submit.prevent="submitForm">
+                <div class="form__group">
+                    <label for="day">Select a day of the week: </label>
+                    <div class="form__input-group">
+                        <select id="day" v-model="selectedDayOfWeek" required>
+                            <option value="" selected>Select day of the week...</option>
+                            <option v-for="(day, index) in dataStore.availableDaysOfWeek" :key="index" :value="day.id">
+                                {{ day.text }}
+                            </option>
+                        </select>
                     </div>
-                    <select class="modal__select" v-model="selectedDayOfWeek" required>
-                        <option value="" selected>Select day of the week...</option>
-                        <option v-for="(day, index) in dataStore.availableDaysOfWeek" :key="index" :value="day.id">
-                            {{ day.text }}
-                        </option>
-                    </select>
                 </div>
             </form>
         </div>
         <div class="modal__footer">
-            <div v-if="error" class="modal__error">{{ error }}</div>
-            <button class="modal__button" form="modalForm" :disabled='dataStore.isLoading'>
+            <div v-if="error" class="footer__error">{{ error }}</div>
+            <button class="footer__button" form="modalForm" :disabled='dataStore.isLoading'>
                 Create workout
             </button>
         </div>
@@ -62,7 +62,6 @@
 
         dataStore.createWorkout(selectedDayOfWeek.value)
             .then(() => {
-                selectedDayOfWeek.value = '';
                 emit('close');
             })
             .catch((e) => {
@@ -72,5 +71,6 @@
 </script>
 
 <style lang="scss" scoped>
-    @import '@/assets/styles/modal.scss';
+    @import '@/assets/styles/forms.scss';
+    @import '@/assets/styles/modals.scss';
 </style>

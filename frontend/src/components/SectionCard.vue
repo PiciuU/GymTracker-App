@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <router-link :to="'/' + path">
-            <div class="card__figure" :style="backgroundStyles(image)">
+            <div class="card__figure" :style="backgroundImage()">
                 <div class="card__title">
                     <slot></slot>
                 </div>
@@ -13,33 +13,33 @@
 <script setup>
     const props = defineProps({
         path: { type: String, required: true, default: '/' },
-        image: { type: String, required: true, default: '' }
+        image: { type: String, required: true, default: 'missing' }
     });
 
-    function backgroundStyles(imageName) {
+    const backgroundImage = () => {
         return {
-            'background-image': `url(${new URL("../assets/images/" + imageName + ".jpg", import.meta.url).href})`,
+            'background-image': `url(${import.meta.env.BASE_URL}images/${props.image}.jpg)`
         }
-    }
+    };
 </script>
 
 <style lang="scss" scoped>
 .card {
-    max-width: 400px;
-    width: 100%;
     border: 5px solid $--color-overlay;
+    max-width: 400px;
     overflow: hidden;
+    width: 100%;
 
     &__figure {
-        display: flex;
         align-items: center;
-        justify-content: center;
         background-blend-mode: multiply;
         background-color: grey;
         background-position: center;
         background-size: cover;
-        min-height: 150px;
+        display: flex;
+        justify-content: center;
         height: 100%;
+        min-height: 150px;
         transition: all 0.25s ease-in-out;
     }
 
@@ -47,8 +47,8 @@
     &__title {
         font-size: 2.5rem;
         font-weight: bold;
-        letter-spacing: 1rem;
-        margin-right: -1rem; /* Avoid letter spacing gap for last character */
+        letter-spacing: 10px;
+        margin-right: -10px; /* Avoid letter spacing gap for last character */
         text-align: center;
         text-transform: uppercase;
         transition: all .25s ease-in-out;
@@ -60,8 +60,8 @@
 
     &:hover &__title {
         font-size: 2rem;
-        letter-spacing: 1.5rem;
-        margin-right: -1.5rem; /* Avoid letter spacing gap for last character */
+        letter-spacing: 16px;
+        margin-right: -16px; /* Avoid letter spacing gap for last character */
     }
 }
 

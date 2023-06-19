@@ -1,5 +1,3 @@
-@import './variables.scss';
-
 :root {
     font-size: 62.5%;
 }
@@ -15,8 +13,8 @@
 
 html, body {
     min-height: 100vh;
-    color: var(--color-text);
-    background: var(--color-background);
+    color: $--color-text;
+    background: $--color-background;
     font-family: 'Poppins', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
         Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     text-rendering: optimizeLegibility;
@@ -33,8 +31,20 @@ html, body {
     min-height: 100vh;
 }
 
+main {
+    display: flex;
+    flex: 1;
+}
+
+.wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 20px;
+}
+
 a {
-    color: var(--color-text);
+    color: $--color-text;
     text-decoration: none;
 }
 
