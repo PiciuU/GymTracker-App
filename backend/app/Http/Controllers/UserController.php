@@ -6,6 +6,10 @@ use App\Models\User;
 use App\Models\UserRole;
 use App\Models\PasswordResetToken;
 
+use App\Mail\ResetPasswordRequestMail;
+use App\Mail\ResetPasswordConfirmationMail;
+use App\Mail\ResetEmailConfirmationMail;
+
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -16,6 +20,7 @@ use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -164,9 +169,9 @@ class UserController extends Controller
             'valid_until' => Carbon::now()->addDay()->format('Y-m-d H:i:s')
         ]);
 
-        // Mail::to($user->email)->send(new ResetPasswordRequestMail($resetPasswordHash));
+        $mailSent = Mail::to($user->email)->send(new ResetPasswordRequestMail($resetPasswordHash));
 
-        // if (Mail::failures()) return $this->errorResponse('An error occurred while sending email, try again later', 500);
+        if (!$mailSent) return $this->errorResponse('An error occurred while sending email, try again later', 500);
 
         return $this->successResponse('If an account is associated with the provided email address, we have sent a message to it.');
     }
@@ -212,7 +217,7 @@ class UserController extends Controller
 
         $resetPassword->delete();
 
-        // Mail::to($advertiser['email'])->send(new ResetPasswordConfirmationMail());
+        Mail::to($user->email)->send(new ResetPasswordConfirmationMail());
 
         return $this->successResponse('Your password has been successfully reset.');
     }
@@ -256,6 +261,8 @@ class UserController extends Controller
 
         if(!$user->update($request->validated())) return $this->errorResponse('An error occurred while updating the user data, try again later', 500);
 
+        Mail::to($user->email)->send(new ResetEmailConfirmationMail());
+
         return $this->successResponse('User data has been successfully updated', new UserResource($user));
     }
 
@@ -282,7 +289,7 @@ class UserController extends Controller
         ])) return $this->errorResponse('An error occurred while updating the password, try again later', 500);
 
 
-        // Implement sending an email about the password change
+        Mail::to($user->email)->send(new ResetPasswordConfirmationMail());
 
         return $this->successResponse('Password updated successfully');
     }
