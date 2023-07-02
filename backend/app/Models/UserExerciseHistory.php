@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserExerciseHistory extends Model
 {
-    protected $table = 'user_exercise_history';
-
     use HasFactory;
+
+    protected $table = 'user_exercise_history';
 
     protected $fillable = [
         'exercise_id',

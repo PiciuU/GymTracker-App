@@ -46,6 +46,18 @@
 <style lang="scss" scoped>
     @import '@/assets/styles/animations.scss';
 
+    .container {
+        align-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        gap: 50px;
+        height: 100%;
+        justify-content: center;
+        padding: 20px 0px;
+        width: 100%;
+    }
+
     .loader {
         &__wrapper {
             align-items: center;

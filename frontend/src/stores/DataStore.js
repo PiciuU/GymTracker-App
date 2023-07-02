@@ -9,9 +9,11 @@ export const useDataStore = defineStore('dataStore', {
     state: () => ({
         workouts: [],
         exercises: [],
-        loading: false
+        loading: false,
+        path: import.meta.env.VITE_APP_UPLOADS_URL
     }),
     getters: {
+        getPath: (state) => state.path,
         getWorkouts: (state) => state.workouts,
         getExercises: (state) => state.exercises,
         getGroupedExercises: (state) => {
@@ -150,6 +152,7 @@ export const useDataStore = defineStore('dataStore', {
                 this.loading = true;
                 const response = await ApiService.post('/exercise', payload);
                 this.exercises.push(response.data);
+                return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
@@ -215,6 +218,37 @@ export const useDataStore = defineStore('dataStore', {
                 this.loading = true;
                 const response = await ApiService.delete(`/history/${id}`);
                 return Promise.resolve(response.data);
+            }
+            catch (error) {
+                return Promise.reject(error.data);
+            } finally {
+                this.loading = false;
+            }
+        },
+        /* Files */
+        async uploadFiles(id, payload) {
+            try {
+                this.loading = true;
+                const response = await ApiService.post(`/exercise/${id}/files`, payload);
+                const exercise = this.exercises.find((exercise) => exercise.id === id);
+                exercise.thumbnailUrl = response.data.files.thumbnailUrl;
+                exercise.attachmentUrl = response.data.files.attachmentUrl;
+                return Promise.resolve(response);
+            }
+            catch (error) {
+                return Promise.reject(error.data);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async deleteFiles(id, payload) {
+            try {
+                this.loading = true;
+                const response = await ApiService.post(`/exercise/${id}/files/delete`, payload);
+                const exercise = this.exercises.find((exercise) => exercise.id === id);
+                exercise.thumbnailUrl = response.data.thumbnailUrl;
+                exercise.attachmentUrl = response.data.attachmentUrl;
+                return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);

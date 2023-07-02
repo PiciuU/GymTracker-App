@@ -14,14 +14,6 @@ class Workout extends Model
         'day_of_week'
     ];
 
-    /**
-     * Get the assigned exercises for this workout.
-     */
-    // public function workoutExercises()
-    // {
-    //     return $this->hasMany(WorkoutExercise::class);
-    // }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

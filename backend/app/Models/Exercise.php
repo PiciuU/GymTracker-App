@@ -20,14 +20,6 @@ class Exercise extends Model
         'is_approved'
     ];
 
-    /**
-     * Get the assigned workouts for this exercise.
-     */
-    // public function workoutExercises()
-    // {
-    //     return $this->hasMany(WorkoutExercise::class);
-    // }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

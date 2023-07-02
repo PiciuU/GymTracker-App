@@ -41,16 +41,35 @@
                 </div>
 
                 <div class="form__group">
-                    <label for="thumbnail">Enter thumbnail: </label>
-                    <div class="form__input-group">
-                        <input type="text" id="thumbnail" v-model="formData.thumbnailUrl" placeholder="Thumbnail">
+                    <label>Exercise availability: </label>
+                    <div class="form__switch-group form__switch-group--alternative">
+                        <input type="radio" id="public" value="1" v-model="formData.isPublic">
+                        <label for="public">Public</label>
+
+                        <input type="radio" id="private" value="0" v-model="formData.isPublic">
+                        <label for="private">Private</label>
                     </div>
                 </div>
 
                 <div class="form__group">
-                    <label for="attachment">Enter attachment: </label>
+                    <label>Upload thumbnail: </label>
                     <div class="form__input-group">
-                        <input type="text" id="attachment" v-model="formData.attachmentUrl" placeholder="Attachment">
+                        <div class="input__file">
+                            <input type="file" id="thumbnail" @change="(event) => handleFileChange(event, 'thumbnail')" accept=".png, .jpg, .jpeg, .webp">
+                            <label for="thumbnail">Choose a file</label>
+                            <span>{{ files.thumbnail?.name }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__group">
+                    <label>Upload attachment: </label>
+                    <div class="form__input-group">
+                        <div class="input__file">
+                            <input type="file" id="attachment" @change="(event) => handleFileChange(event, 'attachment')" accept=".png, .jpg, .jpeg, .webp, .mp4, .gif, .webm">
+                            <label for="attachment">Choose a file</label>
+                            <span>{{ files.attachment?.name }}</span>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -82,19 +101,42 @@
         muscleGroup: null,
         thumbnailUrl: null,
         attachmentUrl: null,
-        isPublic: 1
+        isPublic: 1,
     });
+
+    const files = reactive({
+        thumbnail: null,
+        attachment: null,
+    })
 
     const error = ref('');
 
-    const submitForm = () => {
-        dataStore.createExercise(formData)
-            .then(() => {
-                emit('close');
+    const submitForm = async () => {
+        let isErrorOccured = false;
+        let exerciseId = null;
+        await dataStore.createExercise(formData)
+            .then((response) => {
+                exerciseId = response.data.id;
             })
             .catch((e) => {
+                isErrorOccured = true;
                 error.value = e.message
             })
+        if (isErrorOccured) return;
+
+        // Upload files
+        if (files.thumbnail || files.attachment) {
+            const filesData = new FormData();
+            if (files.thumbnail) filesData.append('thumbnailFile', files.thumbnail);
+            if (files.attachment) filesData.append('attachmentFile', files.attachment);
+            await dataStore.uploadFiles(exerciseId, filesData);
+        }
+        emit('close');
+    };
+
+    const handleFileChange = (event, name) => {
+        if (name == 'thumbnail') files.thumbnail = event.target.files[0];
+        else files.attachment = event.target.files[0];
     };
 </script>
 

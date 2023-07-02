@@ -49,7 +49,7 @@
                     <div class="form__group">
                         <label for="exercise">Enter weight for exercise: </label>
                         <div class="form__input-group">
-                            <input type="number" v-model.number="formData.weight" placeholder="(Optional) Weight (kg)">
+                            <input type="number" v-model.number="formData.weight" placeholder="(Optional) Weight (kg)" step="any">
                         </div>
                     </div>
                 </div>

@@ -6,7 +6,7 @@
                 <font-awesome-icon icon="xmark"/>
             </div>
             <div class="header__image">
-                <img :src="setImage()" @error="setAltImage"/>
+                <img :src="setImage(exercise.thumbnailUrl)" @error="setAltImage"/>
                 <div class="header__title">
                     {{ exercise.name }}
                 </div>
@@ -36,10 +36,11 @@
                 <div class="content__title">
                     Demonstration:
                 </div>
-                <video class="content__video" controls>
+                <video class="content__video" controls v-if="!isImageFile(exercise.attachmentUrl)">
                     <source :src="setVideo()" type="video/mp4" loading="lazy"/>
                     Your browser does not support mp4 videos.
                 </video>
+                <img class="content__image" :src="setImage(exercise.attachmentUrl)" @error="setAltImage" v-else />
             </div>
             <div class="content__group" v-if="exercise.restTime">
                 <div class="content__title">
@@ -57,12 +58,12 @@
                     {{ exercise.weight }} kg
                 </div>
             </div>
-            <div class="content__group" v-if="exercise.weight">
+            <div class="content__group" v-if="exercise.personalBest">
                 <div class="content__title">
                     Personal best:
                 </div>
                 <div class="content__subtitle">
-                    {{ exercise.weight }} kg (2023-06-18)
+                    {{ exercise.personalBest.weight }} kg ({{ exercise.personalBest.date }})
                 </div>
                 <div class="content__hint">
                     <p>Want to check your progress? <router-link to="/progress/history">View personal history.</router-link></p>
@@ -91,7 +92,7 @@
                 <div class="form__group">
                     <label for="weight">Enter weight for exercise: </label>
                     <div class="form__input-group">
-                        <input type="number" id="weight" v-model.number="formData.weight" placeholder="(Optional) Weight (kg)">
+                        <input type="number" id="weight" v-model.number="formData.weight" placeholder="(Optional) Weight (kg)" step="any">
                     </div>
                 </div>
             </form>
@@ -137,16 +138,22 @@
         exercise: { type: Object, required: true, default: '{}' }
     });
 
-    const setImage = () => {
-        return `${import.meta.env.BASE_URL}images/exercises/${props.exercise.thumbnailUrl}.jpg`;
+    const setImage = (imageName) => {
+        if (props.exercise.thumbnailUrl) return `${dataStore.getPath}/${props.exercise.id}/${imageName}`;
+        else return `${dataStore.getPath}/missing.jpg`;
     };
 
     const setAltImage = (event) => {
-        event.target.src = `${import.meta.env.BASE_URL}images/missing.jpg`;
+        event.target.src = `${dataStore.getPath}/missing.jpg`;
     };
 
+    const isImageFile = (url) => {
+      const imageExtensions = ['.gif', '.png', '.jpeg', '.jpg', '.webp'];
+      return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    }
+
     const setVideo = () => {
-        return `${import.meta.env.BASE_URL}videos/exercises/${props.exercise.attachmentUrl}.mp4`;
+        return `${dataStore.getPath}/${props.exercise.id}/${props.exercise.attachmentUrl}`;
     }
 
     const editMode = ref(false);

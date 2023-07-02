@@ -156,55 +156,10 @@
 
 <style lang="scss" scoped>
     @import '@/assets/styles/forms.scss';
-    .container {
-        align-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        gap: 50px;
-        height: 100%;
-        justify-content: center;
-        padding: 20px 0px;
-        width: 100%;
-    }
+    @import '@/assets/styles/sections.scss';
 
-    .section {
-        display: flex;
-        flex: 1 1 auto;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 600px;
-        width: 100%;
-
-        &__card {
-            background: $--color-overlay;
-            border-radius: 5px;
-            padding: 10px 15px;
-
-            .card {
-                &__title {
-                    align-items: center;
-                    display: flex;
-                    justify-content: space-between;
-
-                    h1 {
-                        font-size: 1.6rem;
-                        font-weight: bold;
-                    }
-
-                    svg {
-                        cursor: pointer;
-                        &.active {
-                            color: $--color-primary;
-                        }
-                    }
-                }
-
-                &__subtitle {
-                    color: $--color-text-muted-2;
-                    font-size: 1.2rem;
-                }
-            }
-        }
+    .section__card {
+        padding-bottom: 15px;
+        margin-bottom: 10px;
     }
 </style>

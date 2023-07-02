@@ -21,8 +21,8 @@ class ExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exercises = new ExerciseCollection(Exercise::paginate());
-        else $exercises = new ExerciseCollection(Exercise::where('is_public', true)->paginate());
+        if ($user->tokenCan('admin')) $exercises = new ExerciseCollection(Exercise::all());
+        else $exercises = new ExerciseCollection(Exercise::where('user_id', $user->id)->orWhere('is_public', true)->get());
 
         return $this->successResponse('List of exercises found', $exercises);
     }

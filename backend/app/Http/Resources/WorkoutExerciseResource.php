@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\UserExerciseHistory;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -24,35 +26,34 @@ class WorkoutExerciseResource extends JsonResource
             $formattedTime = sprintf('%02d:%02d', $minutes, $seconds);
         }
 
+        $personalBest = UserExerciseHistory::where('exercise_id', $this->exercise->id)
+            ->where('user_id', auth()->user()->id)
+            ->orderBy('weight', 'desc')
+            ->select('weight', 'date')
+            ->first();
+
+        $fields = [
+            'name' => $this->exercise->name,
+            'description' => $this->exercise->description,
+            'muscleGroup' => $this->exercise->muscle_group,
+            'thumbnailUrl' => $this->exercise->thumbnail_url,
+            'attachmentUrl' => $this->exercise->attachment_url,
+            'sets' => $this->sets,
+            'reps' => $this->reps,
+            'restTime' => $formattedTime,
+            'weight' => $this->weight,
+            'personalBest' => $personalBest
+        ];
+
         if ($request->user()->tokenCan('admin')) {
-            return [
-                'id' => $this->exercise_id,
-                'name' => $this->exercise->name,
-                'description' => $this->exercise->description,
-                'muscleGroup' => $this->exercise->muscle_group,
-                'thumbnailUrl' => $this->exercise->thumbnail_url,
-                'attachmentUrl' => $this->exercise->attachment_url,
+            $fields += [
+                'id' => $this->exercise->id,
                 'userId' => $this->exercise->user_id,
-                'isPublic' => $this->exercise->is_public,
                 'isApproved' => $this->exercise->is_approved,
-                'sets' => $this->sets,
-                'reps' => $this->reps,
-                'restTime' => $formattedTime,
-                'weight' => $this->weight
+                'isPublic' => $this->exercise->is_public
             ];
         }
-        else {
-            return [
-                'name' => $this->exercise->name,
-                'description' => $this->exercise->description,
-                'muscleGroup' => $this->exercise->muscle_group,
-                'thumbnailUrl' => $this->exercise->thumbnail_url,
-                'attachmentUrl' => $this->exercise->attachment_url,
-                'sets' => $this->sets,
-                'reps' => $this->reps,
-                'restTime' => $formattedTime,
-                'weight' => $this->weight
-            ];
-        }
+
+        return $fields;
     }
 }

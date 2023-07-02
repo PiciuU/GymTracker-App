@@ -6,7 +6,7 @@
                 <font-awesome-icon icon="xmark"/>
             </div>
             <div class="header__image">
-                <img :src="setImage()" @error="setAltImage"/>
+                <img :src="setImage(exercise.thumbnailUrl)" @error="setAltImage"/>
                 <div class="header__title">
                     {{ exercise.name }}
                 </div>
@@ -36,10 +36,11 @@
                 <div class="content__title">
                     Demonstration:
                 </div>
-                <video class="content__video" controls>
+                <video class="content__video" controls v-if="!isImageFile(exercise.attachmentUrl)">
                     <source :src="setVideo()" type="video/mp4" loading="lazy"/>
                     Your browser does not support mp4 videos.
                 </video>
+                <img class="content__image" :src="setImage(exercise.attachmentUrl)" @error="setAltImage" v-else />
             </div>
         </div>
         <div class="modal__content" v-else>
@@ -63,17 +64,42 @@
                     </div>
                 </div>
 
-                <div class="form__group">
-                    <label for="thumbnail">Enter thumbnail: </label>
-                    <div class="form__input-group">
-                        <input type="text" id="thumbnail" v-model="formData.thumbnailUrl" placeholder="Thumbnail">
+                <div class="form__group" v-if="props.exercise.isPublic == 0">
+                    <label>Exercise availability: </label>
+                    <div class="form__switch-group form__switch-group--alternative">
+                        <input type="radio" id="public" value="1" v-model="formData.isPublic">
+                        <label for="public">Public</label>
+
+                        <input type="radio" id="private" value="0" v-model="formData.isPublic">
+                        <label for="private">Private</label>
                     </div>
                 </div>
 
                 <div class="form__group">
-                    <label for="attachment">Enter attachment: </label>
+                    <label>Upload thumbnail: </label>
                     <div class="form__input-group">
-                        <input type="text" id="attachment" v-model="formData.attachmentUrl" placeholder="Attachment">
+                        <div class="input__file">
+                            <input type="file" id="thumbnail" @change="(event) => handleFileChange(event, 'thumbnail')" accept=".png, .jpg, .jpeg, .webp">
+                            <label for="thumbnail">Choose a file</label>
+                            <span>{{ files.thumbnail?.name || formData.thumbnailUrl }}</span>
+                            <div v-if="formData.thumbnailUrl">
+                                <font-awesome-icon icon="trash" @click="formData.thumbnailUrl = null" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form__group">
+                    <label>Upload attachment: </label>
+                    <div class="form__input-group">
+                        <div class="input__file">
+                            <input type="file" id="attachment" @change="(event) => handleFileChange(event, 'attachment')" accept=".png, .jpg, .jpeg, .webp, .mp4, .gif, .webm">
+                            <label for="attachment">Choose a file</label>
+                            <span>{{ files.attachment?.name || formData.attachmentUrl }}</span>
+                            <div v-if="formData.attachmentUrl">
+                                <font-awesome-icon icon="trash" @click="formData.attachmentUrl = null" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -119,52 +145,80 @@
     const emit = defineEmits(['close'])
 
     const props = defineProps({
-        exercise: { type: Object, required: true, default: '{}' }
+        exercise: { type: Object, required: true, default: {} }
     });
 
-    const setImage = () => {
-        return `${import.meta.env.BASE_URL}images/exercises/${props.exercise.thumbnailUrl}.jpg`;
+    const setImage = (imageName) => {
+        if (props.exercise.thumbnailUrl) return `${dataStore.getPath}/${props.exercise.id}/${imageName}`;
+        else return `${dataStore.getPath}/missing.jpg`;
     };
 
     const setAltImage = (event) => {
-        event.target.src = `${import.meta.env.BASE_URL}images/missing.jpg`;
+        event.target.src = `${dataStore.getPath}/missing.jpg`;
     };
 
+    const isImageFile = (url) => {
+      const imageExtensions = ['.gif', '.png', '.jpeg', '.jpg', '.webp'];
+      return imageExtensions.some(ext => url.toLowerCase().endsWith(ext));
+    }
+
     const setVideo = () => {
-        return `${import.meta.env.BASE_URL}videos/exercises/${props.exercise.attachmentUrl}.mp4`;
+        return `${dataStore.getPath}/${props.exercise.id}/${props.exercise.attachmentUrl}`;
     }
 
     const editMode = ref(false);
 
-    let formData = reactive({
-        description: props.exercise.description,
-        muscleGroup: props.exercise.muscleGroup,
-        attachmentUrl: props.exercise.attachmentUrl,
-        thumbnailUrl: props.exercise.thumbnailUrl
-    });
+    let formData = reactive({});
 
     const error = ref('');
 
     function toggleEditMode(status) {
         editMode.value = status;
         if (status === true) {
-            formData = {
+            Object.assign(formData, {
                 description: props.exercise.description,
                 muscleGroup: props.exercise.muscleGroup,
                 attachmentUrl: props.exercise.attachmentUrl,
-                thumbnailUrl: props.exercise.thumbnailUrl
-            };
+                thumbnailUrl: props.exercise.thumbnailUrl,
+                isPublic: props.exercise.isPublic
+            });
+            Object.assign(files, {
+                thumbnail: null,
+                attachment: null,
+            })
         }
     }
 
-    const submitForm = () => {
-        dataStore.updateExercise(props.exercise.id, formData)
-            .then(() => {
-                toggleEditMode(false);
-            })
+    const submitForm = async () => {
+        let isErrorOccured = false;
+        await dataStore.updateExercise(props.exercise.id, formData)
             .catch((e) => {
+                isErrorOccured = true;
                 error.value = e.message
             })
+        if (isErrorOccured) return;
+
+        // Upload files
+        if (files.thumbnail || files.attachment) {
+            const filesData = new FormData();
+            if (files.thumbnail) filesData.append('thumbnailFile', files.thumbnail);
+            if (files.attachment) filesData.append('attachmentFile', files.attachment);
+            await dataStore.uploadFiles(props.exercise.id, filesData);
+        }
+        // Delete files
+        else if (props.exercise.thumbnailUrl !== formData.thumbnailUrl || props.exercise.attachmentUrl !== formData.attachmentUrl) {
+            await dataStore.deleteFiles(props.exercise.id, { 'thumbnailUrl': formData.thumbnailUrl, 'attachmentUrl': formData.attachmentUrl });
+        }
+        toggleEditMode(false);
+    };
+
+
+    /* File Upload */
+    const files = reactive({});
+
+    const handleFileChange = (event, name) => {
+        if (name == 'thumbnail') files.thumbnail = event.target.files[0];
+        else files.attachment = event.target.files[0];
     };
 </script>
 

@@ -6,7 +6,7 @@
                     <p>Your exercises</p>
                 </div>
                 <div class="group__items">
-                    <ExercisePreview v-for="exercise in dataStore.getUserExercises" :key="exercise.id" :image="exercise.attachmentUrl" @click="handleClick(exercise)">
+                    <ExercisePreview v-for="exercise in dataStore.getUserExercises" :key="exercise.id" :exercise="exercise" @click="handleClick(exercise)">
                         <template v-slot:title>{{ exercise.name }}</template>
                         <template v-slot:subtitle>Targets {{ exercise.muscleGroup.toLowerCase() }}</template>
                     </ExercisePreview>
@@ -18,7 +18,7 @@
                     <p>All exercises</p>
                 </div>
                 <div class="group__items">
-                    <ExercisePreview v-for="exercise in dataStore.getExercises" :key="exercise.id" :image="exercise.attachmentUrl" @click="handleClick(exercise)">
+                    <ExercisePreview v-for="exercise in dataStore.getExercises" :key="exercise.id" :exercise="exercise" @click="handleClick(exercise)">
                         <template v-slot:title>{{ exercise.name }}</template>
                         <template v-slot:subtitle>Targets {{ exercise.muscleGroup.toLowerCase() }}</template>
                     </ExercisePreview>
@@ -55,49 +55,5 @@
 </script>
 
 <style lang="scss" scoped>
-    .container {
-        align-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        gap: 50px;
-        height: 100%;
-        justify-content: center;
-        padding: 20px 0px;
-        width: 100%;
-    }
-
-    .section {
-        display: flex;
-        flex: 1 1 auto;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 600px;
-        width: 100%;
-
-        &__group {
-            .group {
-                &__label {
-                    display: inline-flex;
-                    margin-bottom: 15px;
-
-                    &:after {
-                        background: var(--color-primary);
-                        bottom: -5px;
-                        content: '';
-                        height: 1px;
-                        left: 0;
-                        position: absolute;
-                        width: 150%;
-                    }
-                }
-
-                &__items {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 5px;
-                }
-            }
-        }
-    }
+    @import '@/assets/styles/sections.scss';
 </style>

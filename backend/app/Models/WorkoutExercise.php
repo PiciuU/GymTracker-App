@@ -18,16 +18,6 @@ class WorkoutExercise extends Model
         'weight'
     ];
 
-    // public function workout()
-    // {
-    //     return $this->belongsTo(Workout::class);
-    // }
-
-    // public function exercise()
-    // {
-    //     return $this->belongsTo(Exercise::class);
-    // }
-
     public function workout()
     {
         return $this->belongsTo(Workout::class, 'workout_id');

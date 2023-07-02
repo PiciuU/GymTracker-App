@@ -17,7 +17,7 @@
                 <div class="form__group">
                     <label for="weight">Enter weight: </label>
                     <div class="form__input-group">
-                        <input type="text" id="weight" v-model="formData.weight" placeholder="Weight (kg)" required/>
+                        <input type="text" id="weight" v-model="formData.weight" placeholder="Weight (kg)" required step="any"/>
                     </div>
                 </div>
 

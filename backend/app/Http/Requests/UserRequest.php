@@ -4,12 +4,20 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Str;
 
 class UserRequest extends FormRequest
 {
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
     protected function failedValidation(Validator $validator)
     {
         $response = response()->json([
@@ -21,14 +29,6 @@ class UserRequest extends FormRequest
         throw (new ValidationException($validator, $response))
             ->errorBag($this->errorBag)
             ->redirectTo($this->getRedirectUrl());
-    }
-
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return true;
     }
 
     /**
@@ -74,10 +74,6 @@ class UserRequest extends FormRequest
         } elseif ($methodName === 'updatePassword') {
             return $this->updatePassword();
         }
-
-        if ($this->hasAdminPrivileges() && $methodName === 'update') {
-            return $this->update();
-        }
     }
 
     /**
@@ -87,8 +83,8 @@ class UserRequest extends FormRequest
      */
     protected function login() : array {
         return [
-            'login' => ['required'],
-            'password' => ['required']
+            'login' => ['required', 'string'],
+            'password' => ['required', 'string']
         ];
     }
 
@@ -99,11 +95,10 @@ class UserRequest extends FormRequest
      */
     protected function register() : array {
         return [
-            'login' => ['required', 'unique:users'],
-            'name' => ['required'],
-            'email'=> ['required', 'email', 'unique:users'],
-            'password' => ['required'],
-            'user_role_id' => ['required', Rule::in([1])],
+            'login' => ['required', 'string', 'min:2', 'max:32', 'regex:/^[a-z0-9_]*$/i', 'unique:users'],
+            'name' => ['required', 'string', 'max:255'],
+            'email'=> ['required', 'email', 'min:3', 'max:255', 'unique:users'],
+            'password' => ['required', 'string']
         ];
     }
 
@@ -125,23 +120,8 @@ class UserRequest extends FormRequest
      */
     protected function reset() : array {
         return [
-            'hash'=> ['required'],
-            'password' => ['required', 'confirmed'],
-        ];
-    }
-
-    /**
-     * Get the validation rules for updating user information.
-     *
-     * @return array
-     */
-    protected function update() : array {
-        return [
-            'name' => ['sometimes', 'required'],
-            'email'=> ['sometimes', 'required', 'email', 'unique:users'],
-            'login' => ['sometimes', 'required', 'unique:users'],
-            'user_role_id' => ['sometimes', 'required', 'integer'],
-            'password' => ['sometimes', 'required']
+            'hash'=> ['required', 'string'],
+            'password' => ['required', 'string', 'confirmed'],
         ];
     }
 
@@ -152,7 +132,7 @@ class UserRequest extends FormRequest
      */
     protected function updateName() : array {
         return [
-            'name' => ['sometimes', 'required'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
         ];
     }
 
@@ -163,7 +143,7 @@ class UserRequest extends FormRequest
      */
     protected function updateMail() : array {
         return [
-            'email' => ['sometimes', 'required', 'email', 'unique:users'],
+            'email' => ['sometimes', 'required', 'email', 'min:3', 'max:255', 'unique:users'],
         ];
     }
 
@@ -174,8 +154,8 @@ class UserRequest extends FormRequest
      */
     protected function updatePassword() : array {
         return [
-            'password_current' => ['required'],
-            'password' => ['required', 'confirmed'],
+            'password_current' => ['required', 'string'],
+            'password' => ['required', 'string', 'confirmed'],
         ];
     }
 
@@ -185,15 +165,7 @@ class UserRequest extends FormRequest
     protected function prepareForValidation() {
         if ($this->isMethod('POST')) {
             $this->merge([
-                'user_role_id' => 1
-            ]);
-            $this->merge([
                 'name' => $this->login
-            ]);
-        }
-        else if ($this->filled('userRoleId')) {
-            $this->merge([
-                'user_role_id' => $this->userRoleId
             ]);
         }
 

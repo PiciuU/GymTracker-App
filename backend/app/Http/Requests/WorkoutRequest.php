@@ -4,15 +4,30 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
 class WorkoutRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function authorize(): bool
+    protected function failedValidation(Validator $validator)
     {
-        return true;
+        $response = response()->json([
+            'status' => "Error",
+            'message' => "Validation failed. Please check the following fields:",
+            'data' => $validator->errors(),
+        ], 422);
+
+        throw (new ValidationException($validator, $response))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**
@@ -43,7 +58,7 @@ class WorkoutRequest extends FormRequest
     protected function store() : array {
         return [
             'user_id' => ['required', 'integer', Rule::exists('users', 'id')],
-            'day_of_week' => ['required', Rule::in([1,2,3,4,5,6,7])]
+            'day_of_week' => ['required', 'integer', Rule::in([1,2,3,4,5,6,7])]
         ];
     }
 
@@ -54,7 +69,7 @@ class WorkoutRequest extends FormRequest
      */
     protected function update() : array {
         $rules = [
-            'day_of_week' => ['required', Rule::in([1,2,3,4,5,6,7])]
+            'day_of_week' => ['required', 'integer', Rule::in([1,2,3,4,5,6,7])]
         ];
 
         if ($this->hasAdminPrivileges()) {
@@ -70,9 +85,6 @@ class WorkoutRequest extends FormRequest
      * Prepare the data for validation.
      */
     protected function prepareForValidation() {
-        $this->merge([
-            'day_of_week' => $this->dayOfWeek
-        ]);
         if ($this->isMethod('POST')) {
             $this->merge([
                 'user_id' => $this->user()->id,
@@ -81,6 +93,12 @@ class WorkoutRequest extends FormRequest
         else if ($this->filled('userId')) {
             $this->merge([
                 'user_id' => $this->userId,
+            ]);
+        }
+
+        if ($this->filed('dayOfWeek')) {
+            $this->merge([
+                'day_of_week' => $this->dayOfWeek
             ]);
         }
     }

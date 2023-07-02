@@ -3,8 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Models\User;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +38,9 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => 'auth:sanct
 
     Route::apiResource('workout', WorkoutController::class);
     Route::apiResource('exercise', ExerciseController::class);
+    Route::post('exercise/{id}/files', [FileController::class, 'upload']);
+    Route::post('exercise/{id}/files/delete', [FileController::class, 'delete']);
+
     Route::apiResource('history', UserExerciseHistoryController::class);
 
     Route::apiResource('workout.exercise', WorkoutExerciseController::class);
@@ -49,46 +52,6 @@ Route::group(['prefix' => 'auth'], function() {
     Route::get('recover/{hash}', [UserController::class, 'recoverToken']);
     Route::post('recover', [UserController::class, 'recover']);
     Route::post('reset', [UserController::class, 'resetPassword']);
-});
-
-Route::get('/setup', function() {
-    $credentials = [
-        'user_role_id' => 2,
-        'login' => 'admin',
-        'name' => 'Administrator',
-        'email' => 'admin@test.pl',
-        'password' => 'Piciu103'
-    ];
-
-    if (!Auth::attempt($credentials)) {
-        $user = new User();
-
-        $user->user_role_id = $credentials['user_role_id'];
-        $user->login = $credentials['login'];
-        $user->name = $credentials['name'];
-        $user->email = $credentials['email'];
-        $user->password = Hash::make($credentials['password']);
-        $user->save();
-
-        $cred = [
-            'email' => 'admin@test.pl',
-            'password' => 'Piciu103'
-        ];
-
-        if (Auth::attempt($cred)) {
-            $user = Auth::user();
-
-            $adminToken = $user->createToken('admin-token', ['all']);
-            $verifiedToken = $user->createToken('verified-token', ['advanced']);
-            $basicToken = $user->createToken('basic-token', ['basic']);
-
-            return [
-                'admin' => $adminToken->plainTextToken,
-                'verified' => $verifiedToken->plainTextToken,
-                'basic' => $basicToken->plainTextToken,
-            ];
-        }
-    }
 });
 
 Route::fallback(function(){

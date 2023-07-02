@@ -4,15 +4,30 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
 class UserExerciseHistoryRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function authorize(): bool
+    protected function failedValidation(Validator $validator)
     {
-        return true;
+        $response = response()->json([
+            'status' => "Error",
+            'message' => "Validation failed. Please check the following fields:",
+            'data' => $validator->errors(),
+        ], 422);
+
+        throw (new ValidationException($validator, $response))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**
@@ -74,11 +89,6 @@ class UserExerciseHistoryRequest extends FormRequest
      * Prepare the data for validation.
      */
     protected function prepareForValidation() {
-        if ($this->filled('exerciseId')) {
-            $this->merge([
-                'exercise_id' => $this->exerciseId,
-            ]);
-        }
         if ($this->isMethod('POST')) {
             $this->merge([
                 'user_id' => $this->user()->id,
@@ -87,6 +97,12 @@ class UserExerciseHistoryRequest extends FormRequest
         else if ($this->filled('userId')) {
             $this->merge([
                 'user_id' => $this->userId,
+            ]);
+        }
+
+        if ($this->filled('exerciseId')) {
+            $this->merge([
+                'exercise_id' => $this->exerciseId,
             ]);
         }
     }

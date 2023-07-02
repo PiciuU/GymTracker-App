@@ -27,18 +27,23 @@
 </template>
 
 <script setup>
+    import { useDataStore } from '@/stores/DataStore';
+
+    const dataStore = useDataStore();
+
     const props = defineProps({
-        image: { type: String, required: true, default: '' },
+        exercise: { type: Object, required: true, default: {} },
         editMode: { type: Boolean, required: false, default: false },
         isLoading: { type: Boolean, required: false, default: false }
     });
 
     const setImage = () => {
-        return `${import.meta.env.BASE_URL}images/exercises/${props.image}.jpg`;
+        if (props.exercise.thumbnailUrl) return `${dataStore.getPath}/${props.exercise.id}/${props.exercise.thumbnailUrl}`;
+        else return `${dataStore.getPath}/missing.jpg`;
     };
 
     const setAltImage = (event) => {
-        event.target.src = `${import.meta.env.BASE_URL}images/missing.jpg`;
+        event.target.src = `${dataStore.getPath}/missing.jpg`;
     };
 </script>
 

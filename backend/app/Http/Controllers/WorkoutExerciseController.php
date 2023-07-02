@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\UserExerciseHistory;
 use App\Models\WorkoutExercise;
 use App\Models\Workout;
 use App\Models\Exercise;
@@ -66,6 +67,22 @@ class WorkoutExerciseController extends Controller
 
         $workoutExercise = new WorkoutExerciseResource(WorkoutExercise::create($request->validated()));
 
+        // Create entry in user exercise history
+        $personalBest = UserExerciseHistory::where('exercise_id', $exercise->id)
+            ->where('user_id', $user->id)
+            ->orderBy('weight', 'desc')
+            ->select('weight', 'date')
+            ->first();
+
+        if (!$personalBest || $personalBest->weight < $workoutExercise->weight) {
+            UserExerciseHistory::create([
+                'exercise_id' => $exercise->id,
+                'user_id' => $user->id,
+                'weight' => $workoutExercise->weight,
+                'date' => date('Y-m-d')
+            ]);
+        }
+
         if (!$workoutExercise) return $this->errorResponse('An error occurred while adding the exercise to the plan, please try again later', 500);
 
         return $this->successResponse('Exercise has been added to the plan successfully', $workoutExercise);
@@ -122,6 +139,22 @@ class WorkoutExerciseController extends Controller
         if (!$workoutExercise) return $this->errorResponse('Workout exercise not found', 404);
 
         if(!$workoutExercise->update($request->validated())) return $this->errorResponse('An error occurred while updating the workout exercise, please try again later', 500);
+
+        // Create entry in user exercise history
+        $personalBest = UserExerciseHistory::where('exercise_id', $exerciseSlug)
+            ->where('user_id', $user->id)
+            ->orderBy('weight', 'desc')
+            ->select('weight', 'date')
+            ->first();
+
+        if (!$personalBest || $personalBest->weight < $workoutExercise->weight) {
+            UserExerciseHistory::create([
+                'exercise_id' => $exerciseSlug,
+                'user_id' => $user->id,
+                'weight' => $workoutExercise->weight,
+                'date' => date('Y-m-d')
+            ]);
+        }
 
         return $this->successResponse('Workout exercise has been successfully updated', new WorkoutExerciseResource($workoutExercise));
     }

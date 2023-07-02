@@ -14,7 +14,7 @@
                     <p>{{ exercises.muscleGroup }}</p>
                 </div>
                 <div class="group__items">
-                    <ExercisePreview v-for="exercise in exercises.items" :key="exercise.id" :image="exercise.attachmentUrl" :editMode="editMode" :isLoading="dataStore.isLoading" @click="handleClick(exercise)">
+                    <ExercisePreview v-for="exercise in exercises.items" :key="exercise.id" :exercise="exercise" :editMode="editMode" :isLoading="dataStore.isLoading" @click="handleClick(exercise)">
                         <template v-slot:title>{{ exercise.name }}</template>
                         <template v-slot:subtitle>{{ exercise.sets }} series, {{ exercise.reps }} reps</template>
                     </ExercisePreview>
@@ -88,80 +88,9 @@
 </script>
 
 <style lang="scss" scoped>
-    .container {
-        align-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        gap: 50px;
-        height: 100%;
-        justify-content: center;
-        padding: 20px 0px;
-        width: 100%;
-    }
+    @import '@/assets/styles/sections.scss';
 
-    .section {
-        display: flex;
-        flex: 1 1 auto;
-        flex-direction: column;
-        gap: 10px;
-        max-width: 600px;
-        width: 100%;
-
-        &__card {
-            background: $--color-overlay;
-            border-radius: 5px;
-            padding: 10px 15px;
-
-            .card {
-                &__title {
-                    align-items: center;
-                    display: flex;
-                    justify-content: space-between;
-
-                    h1 {
-                        font-size: 1.6rem;
-                        font-weight: bold;
-                    }
-
-                    svg {
-                        cursor: pointer;
-                        &.active {
-                            color: $--color-primary;
-                        }
-                    }
-                }
-
-                &__subtitle {
-                    color: $--color-text-muted-2;
-                    font-size: 1.2rem;
-                }
-            }
-        }
-
-        &__group {
-            .group {
-                &__label {
-                    display: inline-flex;
-                    margin-bottom: 15px;
-
-                    &:after {
-                        background: var(--color-primary);
-                        bottom: -5px;
-                        content: '';
-                        height: 1px;
-                        left: 0;
-                        position: absolute;
-                        width: 150%;
-                    }
-                }
-
-                &__items {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 5px;
-                }
-            }
-        }
+    .section__card > .card__title > h1 {
+        font-weight: bold;
     }
 </style>

@@ -6,14 +6,14 @@
             <div class="form__group">
                 <label for="weight">Weight (kg)</label>
                 <div class="form__input-group">
-                    <input type="number" id="weight" v-model="data.weight" required/>
+                    <input type="number" id="weight" v-model="data.weight" autocomplete="off" required/>
                 </div>
             </div>
 
             <div class="form__group">
                 <label for="height">Height (cm)</label>
                 <div class="form__input-group">
-                    <input type="number" id="height" v-model="data.height" required/>
+                    <input type="number" id="height" v-model="data.height" autocomplete="off" required/>
                 </div>
             </div>
 
@@ -47,21 +47,21 @@
             <div class="form__group">
                 <label for="age">Age</label>
                 <div class="form__input-group">
-                    <input type="number" id="age" v-model="data.age" required/>
+                    <input type="number" id="age" v-model="data.age" autocomplete="off" required/>
                 </div>
             </div>
 
             <div class="form__group">
                 <label for="weight">Weight (kg)</label>
                 <div class="form__input-group">
-                    <input type="number" id="weight" v-model="data.weight" required/>
+                    <input type="number" id="weight" v-model="data.weight" autocomplete="off" required/>
                 </div>
             </div>
 
             <div class="form__group">
                 <label for="height">Height (cm)</label>
                 <div class="form__input-group">
-                    <input type="number" id="height" v-model="data.height" required/>
+                    <input type="number" id="height" v-model="data.height" autocomplete="off" required/>
                 </div>
             </div>
 

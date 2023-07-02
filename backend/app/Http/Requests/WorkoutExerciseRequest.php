@@ -4,15 +4,30 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
 class WorkoutExerciseRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function authorize(): bool
+    protected function failedValidation(Validator $validator)
     {
-        return true;
+        $response = response()->json([
+            'status' => "Error",
+            'message' => "Validation failed. Please check the following fields:",
+            'data' => $validator->errors(),
+        ], 422);
+
+        throw (new ValidationException($validator, $response))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**
@@ -33,13 +48,6 @@ class WorkoutExerciseRequest extends FormRequest
     public function rules(): array
     {
         return $this->isMethod('POST') ? $this->store() : $this->update();
-
-        // return [
-        //     'sets' => ['integer'],
-        //     'reps' => ['integer'],
-        //     'rest_time' => ['integer'],
-        //     'weight' => ['numeric', 'regex:/^\d{0,6}(\.\d{1,2})?$/']
-        // ];
     }
 
      /**
@@ -49,12 +57,12 @@ class WorkoutExerciseRequest extends FormRequest
      */
     protected function store() : array {
         return [
-            'sets' => ['sometimes','required','integer'],
-            'reps' => ['sometimes','required','integer'],
+            'workout_id' => ['required', 'integer', Rule::exists('workouts', 'id')],
+            'exercise_id' => ['required', 'integer', Rule::exists('exercises', 'id')],
+            'sets' => ['sometimes', 'required', 'integer'],
+            'reps' => ['sometimes', 'required', 'integer'],
             'rest_time' => ['sometimes', 'nullable', 'integer'],
             'weight' => ['sometimes', 'nullable', 'numeric', 'regex:/^\d{0,6}(\.\d{1,2})?$/'],
-            'workout_id' => ['required', 'integer', Rule::exists('workouts', 'id')],
-            'exercise_id' => ['required', 'integer', Rule::exists('exercises', 'id')]
         ];
     }
 
@@ -80,27 +88,6 @@ class WorkoutExerciseRequest extends FormRequest
 
         return $rules;
     }
-
-    // public function validationData() {
-    //     $segments = $this->segments();
-    //     $workoutIndex = array_search('workout', $segments);
-    //     $workoutSlug = $segments[$workoutIndex + 1];
-
-    //     if ($this->isMethod('POST')) {
-    //         return array_merge($this->all(), [
-    //             'workout_id' => $workoutSlug,
-    //         ]);
-    //     }
-    //     else {
-    //         $exerciseIndex = array_search('exercise', $segments);
-    //         $exerciseSlug = $segments[$exerciseIndex + 1];
-
-    //         return array_merge($this->all(), [
-    //             'workout_id' => $workoutSlug,
-    //             'exercise_id' => $exerciseSlug
-    //         ]);
-    //     }
-    // }
 
     /**
      * Prepare the data for validation.

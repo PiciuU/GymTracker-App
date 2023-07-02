@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('thumbnail_url', 255)->nullable();
             $table->string('attachment_url', 255)->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->boolean('is_public')->default(0);
-            $table->boolean('is_approved')->default(0);
+            $table->boolean('is_public')->default(1);
+            $table->boolean('is_approved')->default(1);
             $table->timestamps();
         });
     }

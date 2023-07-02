@@ -4,15 +4,37 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Contracts\Validation\Validator;
 
 class ExerciseRequest extends FormRequest
 {
+    const MUSCLE_GROUPS = [
+        'Traps', 'Shoulders', 'Chest', 'Biceps', 'Forearms',
+        'Obliques', 'Abdominals', 'Quads', 'Calves', 'Lats',
+        'Triceps', 'Lower Back', 'Glutes', 'Hamstrings',
+        'Warmup', 'Full Body', 'Legs'
+    ];
+
     /**
-     * Determine if the user is authorized to make this request.
+     * Handle a failed validation attempt.
+     *
+     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function authorize(): bool
+    protected function failedValidation(Validator $validator)
     {
-        return true;
+        $response = response()->json([
+            'status' => "Error",
+            'message' => "Validation failed. Please check the following fields:",
+            'data' => $validator->errors(),
+        ], 422);
+
+        throw (new ValidationException($validator, $response))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**
@@ -42,14 +64,11 @@ class ExerciseRequest extends FormRequest
      */
     protected function store() : array {
         return [
-            'name' => ['required'],
+            'name' => ['required', 'string', 'max:255'],
             'description' => ['sometimes', 'required'],
-            'muscle_group' => ['sometimes', 'required'],
-            'thumbnail_url' => ['sometimes', 'required'],
-            'attachment_url' => ['sometimes', 'required'],
+            'muscle_group' => ['sometimes', 'required', 'string', Rule::in(self::MUSCLE_GROUPS)],
             'user_id' => ['required', 'integer', Rule::exists('users', 'id')],
             'is_public' => ['required','integer', Rule::in([0,1])],
-            'is_approved' => ['required','integer', Rule::in([0,1])],
         ];
     }
 
@@ -60,12 +79,10 @@ class ExerciseRequest extends FormRequest
      */
     protected function update() : array {
         $rules = [
-            'name' => ['sometimes','required','string'],
-            'description' => ['sometimes'],
-            'muscle_group' => ['sometimes'],
-            'thumbnail_url' => ['sometimes'],
-            'attachment_url' => ['sometimes'],
-            'is_public' => ['sometimes','integer', Rule::in([0,1])],
+            'name' => ['sometimes','required','string', 'max:255'],
+            'description' => ['sometimes', 'string'],
+            'muscle_group' => ['sometimes', 'string', Rule::in(self::MUSCLE_GROUPS)],
+            'is_public' => ['sometimes', 'integer', Rule::in([0,1])],
         ];
 
         if ($this->hasAdminPrivileges()) {
@@ -93,32 +110,24 @@ class ExerciseRequest extends FormRequest
             ]);
         }
 
-        if ($this->isMethod('POST')) {
-            $this->merge([
-                'is_approved' => $this->hasAdminPrivileges(),
-            ]);
-        }
-        else if ($this->hasAdminPrivileges() && $this->filled('isApproved')) {
-            $this->merge([
-                'is_approved' => $this->isApproved,
-            ]);
-        }
-
         if ($this->filled('muscleGroup')) {
             $this->merge([
                 'muscle_group' => $this->muscleGroup
             ]);
         }
+
         if ($this->filled('thumbnailUrl')) {
             $this->merge([
                 'thumbnail_url' => $this->thumbnailUrl
             ]);
         }
+
         if ($this->filled('attachmentUrl')) {
             $this->merge([
                 'attachment_url' => $this->attachmentUrl
             ]);
         }
+
         if ($this->filled('isPublic')) {
             $this->merge([
                 'is_public' => $this->isPublic
