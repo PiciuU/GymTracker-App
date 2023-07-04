@@ -19,7 +19,7 @@ class WorkoutExerciseFactory extends Factory
     public function definition(): array
     {
         return [
-            'workout_id' => Workout::factory(),
+            'workout_id' => Workout::inRandomOrder()->first()->id,
             'exercise_id' => function (array $attributes) {
                 return Exercise::whereNotIn('id', function ($query) use ($attributes) {
                     $query->select('exercise_id')
@@ -27,9 +27,9 @@ class WorkoutExerciseFactory extends Factory
                         ->where('workout_id', $attributes['workout_id']);
                 })->pluck('id')->random();
             },
-            'sets' => $this->faker->numberBetween(1, 10),
+            'sets' => $this->faker->numberBetween(1, 5),
             'reps' => $this->faker->numberBetween(1, 20),
-            'rest_time' => $this->faker->numberBetween(30, 300),
+            'rest_time' => $this->faker->numberBetween(60, 300),
             'weight' => $this->faker->randomFloat(2, 20, 150),
         ];
     }

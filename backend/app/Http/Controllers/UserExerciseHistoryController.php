@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\UserExerciseHistory;
 use App\Models\Exercise;
-use Illuminate\Http\Request;
 use App\Http\Resources\UserExerciseHistoryResource;
 use App\Http\Resources\UserExerciseHistoryCollection;
 use App\Http\Requests\UserExerciseHistoryRequest;
@@ -18,8 +17,8 @@ class UserExerciseHistoryController extends Controller
      */
     public function index()
     {
-        $exerciseHistoryCollection = new UserExerciseHistoryCollection(auth()->user()->history);
-        return $this->successResponse('User exercise history list found', $exerciseHistoryCollection);
+        $userExerciseHistory = new UserExerciseHistoryCollection(auth()->user()->history);
+        return $this->successResponse("User exercise history has been successfully found.", $userExerciseHistory);
     }
 
     /**
@@ -30,28 +29,26 @@ class UserExerciseHistoryController extends Controller
      */
     public function store(UserExerciseHistoryRequest $request)
     {
+        $exercise = Exercise::find($request->exerciseId);
+
+        if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
+
         $user = auth()->user();
 
-        // Find exercise
-        $exercise = Exercise::find($request->exerciseId);
-        if (!$exercise) return $this->errorResponse('Exercise not found.', 404);
-
-        // Check exercise availability
-        if (!$exercise->is_public && $exercise->user_id !== auth()->user()->id && !auth()->user()->tokenCan('admin')) {
-            return $this->errorResponse('Exercise not available.', 404);
+        if (!$exercise->is_public && $exercise->user_id !== $user->id && !$user->hasAdminPrivileges()) {
+            return $this->errorResponse("Exercise not available.", 404);
         }
 
-        $createdExerciseHistory = new UserExerciseHistoryResource(UserExerciseHistory::create($request->validated()));
+        $userExerciseHistory = new UserExerciseHistoryResource(UserExerciseHistory::create($request->validated()));
 
-        if (!$createdExerciseHistory) return $this->errorResponse('An error occurred while adding the user exercise history entry, try again later', 500);
+        if (!$userExerciseHistory) return $this->errorResponse("An error occurred while adding the user exercise history entry, try again later.", 500);
 
-        return $this->successResponse('User exercise history entry has been added successfully', $createdExerciseHistory);
+        return $this->successResponse("User exercise history has been successfully created.", $userExerciseHistory);
     }
 
     /**
      * Display the specified user exercise history entry.
      *
-     * Note: If the user has admin privileges, they can view any user exercise history entry.
      *
      * @param  int  $id
      * @return \App\Http\Traits\ResponseTrait
@@ -60,14 +57,11 @@ class UserExerciseHistoryController extends Controller
     {
         $user = auth()->user();
 
-        // if ($user->tokenCan('admin')) $exerciseHistory = UserExerciseHistory::find($id);
-        // else $exerciseHistory = $user->history()->find($id);
+        $userExerciseHistory = new UserExerciseHistoryCollection($user->history()->where('exercise_id', $id)->orderBy('date', 'desc')->get());
 
-        $exerciseHistoryCollection = new UserExerciseHistoryCollection($user->history()->where('exercise_id', $id)->orderBy('date', 'desc')->get());
+        if (!$userExerciseHistory) return $this->errorResponse("User exercise history not found.", 404);
 
-        if (!$exerciseHistoryCollection) return $this->errorResponse('User exercise history not found.', 404);
-
-        return $this->successResponse('User exercise history found', $exerciseHistoryCollection);
+        return $this->successResponse("User exercise history has been successfully found.", $userExerciseHistory);
     }
 
     /**
@@ -83,32 +77,31 @@ class UserExerciseHistoryController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exerciseHistory = UserExerciseHistory::find($id);
-        else $exerciseHistory = $user->history()->find($id);
+        if ($user->tokenCan('admin')) $userExerciseHistory = UserExerciseHistory::find($id);
+        else $userExerciseHistory = $user->history()->find($id);
 
-        if (!$exerciseHistory) return $this->errorResponse('User exercise history not found', 404);
+        if (!$userExerciseHistory) return $this->errorResponse("User exercise history not found", 404);
 
-        if(!$exerciseHistory->update($request->validated())) return $this->errorResponse('An error occurred while updating the user exercise history entry, try again later', 500);
+        if(!$userExerciseHistory->update($request->validated())) return $this->errorResponse("An error occurred while updating the user exercise history, try again later.", 500);
 
-        return $this->successResponse('User exercise history entry has been updated successfully', new UserExerciseHistoryResource($exerciseHistory));
+        return $this->successResponse("User exercise history has been successfully updated.", new UserExerciseHistoryResource($userExerciseHistory));
     }
 
     /**
      * Remove the specified user exercise history entry.
      *
-     * Note: If the user has admin privileges, they can delete any user exercise history entry.
      *
      * @param  int  $id
      * @return \App\Http\Traits\ResponseTrait
      */
     public function destroy($id)
     {
-        $exerciseHistory = auth()->user()->history()->find($id);
+        $userExerciseHistory = auth()->user()->history()->find($id);
 
-        if (!$exerciseHistory) return $this->errorResponse('User exercise history not found', 404);
+        if (!$userExerciseHistory) return $this->errorResponse("User exercise history not found.", 404);
 
-        if(!$exerciseHistory->delete()) return $this->errorResponse('An error occurred while deleting the user exercise history entry, try again later', 500);
+        if(!$userExerciseHistory->delete()) return $this->errorResponse("An error occurred while deleting the user exercise history, try again later.", 500);
 
-        return $this->successResponse('User exercise history entry has been deleted successfully');
+        return $this->successResponse("User exercise history has been successfully deleted.");
     }
 }

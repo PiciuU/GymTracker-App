@@ -15,21 +15,19 @@ class UserExerciseHistoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fields = [
+            'id' => $this->id,
+            'weight' => $this->weight,
+            'date' => $this->date
+        ];
+
         if ($request->user()->tokenCan('admin')) {
-            return [
-                'id' => $this->id,
+            $fields += [
                 'exerciseId' => $this->exercise_id,
                 'userId' => $this->user_id,
-                'weight' => $this->weight,
-                'date' => $this->date
             ];
         }
-        else {
-            return [
-                'id' => $this->id,
-                'weight' => $this->weight,
-                'date' => $this->date
-            ];
-        }
+
+        return $fields;
     }
 }

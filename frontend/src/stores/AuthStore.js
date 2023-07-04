@@ -25,7 +25,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -38,7 +39,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -50,7 +52,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
                 this.clearAuthorization();
             }
@@ -63,7 +66,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -75,7 +79,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -87,7 +92,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -113,7 +119,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -125,7 +132,8 @@ export const useAuthStore = defineStore('authStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -135,12 +143,13 @@ export const useAuthStore = defineStore('authStore', {
                 const response = await ApiService.get('auth/user');
                 this.user = response.data;
                 return Promise.resolve();
-            } catch (error) {
+            }
+            catch (error) {
                this.clearAuthorization();
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
-
         },
         setAuthorization(token, user) {
             this.user = user;

@@ -2,24 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ad;
-
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
-    /**
-     * Checks if the user has administrator privileges.
-     *
-     * @return bool
-     */
-    public function hasAccess()
-    {
-        return auth()->user()->hasAdminPrivileges();
-    }
-
     /**
      * Process files and store them.
      *
@@ -92,7 +79,7 @@ class FileController extends Controller
             'attachment_url' => $data['attachmentUrl']
         ]);
 
-        return $this->successResponse("Files have been successfully uploaded", ['files' => $data]);
+        return $this->successResponse("Files have been successfully uploaded.", ['files' => $data]);
     }
 
     /**

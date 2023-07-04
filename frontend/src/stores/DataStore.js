@@ -7,10 +7,10 @@ import { useAuthStore as authStore } from '@/stores/AuthStore';
 
 export const useDataStore = defineStore('dataStore', {
     state: () => ({
+        path: import.meta.env.VITE_APP_UPLOADS_URL,
         workouts: [],
         exercises: [],
         loading: false,
-        path: import.meta.env.VITE_APP_UPLOADS_URL
     }),
     getters: {
         getPath: (state) => state.path,
@@ -35,13 +35,12 @@ export const useDataStore = defineStore('dataStore', {
             });
         },
         getUserExercises: (state) => state.exercises.filter(exercise => exercise.userId === authStore().user.id),
-        isLoading: (state) => state.loading,
         availableDaysOfWeek: (state) => {
             const workouts = state.workouts;
             const daysOfWeek = [
-              { id: 1, text: 'Monday' },
-              { id: 2, text: 'Tuesday' },
-              { id: 3, text: 'Wednesday' },
+                { id: 1, text: 'Monday' },
+                { id: 2, text: 'Tuesday' },
+                { id: 3, text: 'Wednesday' },
               { id: 4, text: 'Thursday' },
               { id: 5, text: 'Friday' },
               { id: 6, text: 'Saturday' },
@@ -58,13 +57,14 @@ export const useDataStore = defineStore('dataStore', {
         availableMuscleGroups: () => {
             const muscleGroups = [
                 'Traps', 'Shoulders', 'Chest', 'Biceps', 'Forearms',
-                'Obliques', 'Abdominals', 'Quads', 'Calves', 'Lats',
-                'Triceps', 'Lower Back', 'Glutes', 'Hamstrings',
-                'Warmup', 'Full Body', 'Legs'
+                'Obliques', 'Abs', 'Quads', 'Calves', 'Lats',
+                'Triceps', 'Lower Back', 'Back', 'Glutes', 'Hamstrings',
+                'Warmup', 'Full Body', 'Legs', 'Arms',
             ];
 
             return muscleGroups.sort();
-        }
+        },
+        isLoading: (state) => state.loading,
     },
     actions: {
         async fetchData() {
@@ -78,39 +78,42 @@ export const useDataStore = defineStore('dataStore', {
 
                 this.workouts = workoutsResponse.data;
                 this.exercises = exercisesResponse.data;
-
-            } catch (error) {
+                return Promise.resolve();
+            }
+            catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
         async createWorkout(payload) {
             try {
                 this.loading = true;
-                const response = await ApiService.post('/workout', { dayOfWeek: payload});
+                const response = await ApiService.post('/workout', payload);
                 this.workouts.push(response.data);
                 this.sortWorkoutsAlphabetically();
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
-        async addWorkoutExercise(payload) {
+        async addWorkoutExercise(workoutId, payload) {
             try {
                 this.loading = true;
-                const response = await ApiService.post(`/workout/${payload.workoutId}/exercise`, payload);
+                const response = await ApiService.post(`/workout/${workoutId}/exercise`, payload);
                 const workout = this.workouts.find(w => w.id === payload.workoutId);
-                if (workout) {
-                    workout.exercises.push(response.data);
-                }
-
+                if (workout) workout.exercises.push(response.data);
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -123,11 +126,12 @@ export const useDataStore = defineStore('dataStore', {
                     const exercise = workout.exercises.find(e => e.id === exerciseId);
                     Object.assign(exercise, response.data);
                 }
-
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -140,10 +144,12 @@ export const useDataStore = defineStore('dataStore', {
                     const index = workout.exercises.findIndex((e) => e.id === exerciseId);
                     workout.exercises.splice(index, 1);
                 }
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -156,7 +162,8 @@ export const useDataStore = defineStore('dataStore', {
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -167,13 +174,15 @@ export const useDataStore = defineStore('dataStore', {
                 this.workouts.forEach(workout => {
                     const workoutExercise = workout.exercises.find(e => e.id === exerciseId)
                     if (workoutExercise) Object.assign(workoutExercise, response.data);
-                })
-                const exercise = this.exercises.find(e => e.id === exerciseId)
+                });
+                const exercise = this.exercises.find(e => e.id === exerciseId);
                 if (exercise) Object.assign(exercise, response.data);
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -181,11 +190,12 @@ export const useDataStore = defineStore('dataStore', {
             try {
                 this.loading = true;
                 const response = await ApiService.get(`/history/${exerciseId}`);
-                return Promise.resolve(response.data);
+                return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
@@ -193,7 +203,7 @@ export const useDataStore = defineStore('dataStore', {
             try {
                 this.loading = true;
                 const response = await ApiService.post('/history', payload);
-                return Promise.resolve(response.data);
+                return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
@@ -201,58 +211,62 @@ export const useDataStore = defineStore('dataStore', {
                 this.loading = false;
             }
         },
-        async updateExerciseHistory(payload) {
+        async updateExerciseHistory(historyId, payload) {
             try {
                 this.loading = true;
-                const response = await ApiService.put(`/history/${payload.exerciseId}`, payload);
-                return Promise.resolve(response.data);
+                const response = await ApiService.put(`/history/${historyId}`, payload);
+                return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
         async deleteExerciseHistory(id) {
             try {
                 this.loading = true;
-                const response = await ApiService.delete(`/history/${id}`);
-                return Promise.resolve(response.data);
+                await ApiService.delete(`/history/${id}`);
+                return Promise.resolve();
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
         /* Files */
-        async uploadFiles(id, payload) {
+        async uploadFiles(exerciseId, payload) {
             try {
                 this.loading = true;
-                const response = await ApiService.post(`/exercise/${id}/files`, payload);
-                const exercise = this.exercises.find((exercise) => exercise.id === id);
+                const response = await ApiService.post(`/exercise/${exerciseId}/files`, payload);
+                const exercise = this.exercises.find((exercise) => exercise.id === exerciseId);
                 exercise.thumbnailUrl = response.data.files.thumbnailUrl;
                 exercise.attachmentUrl = response.data.files.attachmentUrl;
                 return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },
-        async deleteFiles(id, payload) {
+        async deleteFiles(exerciseId, payload) {
             try {
                 this.loading = true;
-                const response = await ApiService.post(`/exercise/${id}/files/delete`, payload);
-                const exercise = this.exercises.find((exercise) => exercise.id === id);
+                const response = await ApiService.post(`/exercise/${exerciseId}/files/delete`, payload);
+                const exercise = this.exercises.find((exercise) => exercise.id === exerciseId);
                 exercise.thumbnailUrl = response.data.thumbnailUrl;
                 exercise.attachmentUrl = response.data.attachmentUrl;
                 return Promise.resolve(response);
             }
             catch (error) {
                 return Promise.reject(error.data);
-            } finally {
+            }
+            finally {
                 this.loading = false;
             }
         },

@@ -67,19 +67,19 @@
     const submitForm = () => {
         if (props.mode === 'add') {
             dataStore.addExerciseHistory(formData)
-                .then((entry) => {
+                .then((response) => {
                     emit('close');
-                    emit('add', entry);
+                    emit('add', response.data);
                 })
                 .catch((e) => {
                     error.value = e.message
                 })
         }
         else {
-            dataStore.updateExerciseHistory(formData)
-                .then((entry) => {
+            dataStore.updateExerciseHistory(props.historyEntry.id, formData)
+                .then((response) => {
                     emit('close');
-                    emit('update', entry);
+                    emit('update', response.data);
                 })
                 .catch((e) => {
                     error.value = e.message

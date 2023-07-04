@@ -6,7 +6,6 @@ use App\Models\UserExerciseHistory;
 use App\Models\WorkoutExercise;
 use App\Models\Workout;
 use App\Models\Exercise;
-use Illuminate\Http\Request;
 use App\Http\Resources\WorkoutExerciseResource;
 use App\Http\Resources\WorkoutExerciseCollection;
 use App\Http\Requests\WorkoutExerciseRequest;
@@ -23,16 +22,10 @@ class WorkoutExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $workoutExercises = new WorkoutExerciseCollection(WorkoutExercise::where('workout_id', $workoutSlug)->paginate());
-        else {
-            $workoutExercises = new WorkoutExerciseCollection(WorkoutExercise::where('workout_id', $workoutSlug)
-            ->whereHas('workout', function ($query) {
-                $query->where('user_id', $user->id);
-            })
-            ->paginate());
-        }
+        if ($user->hasAdminPrivileges()) $workoutExercises = new WorkoutExerciseCollection(WorkoutExercise::where('workout_id', $workoutSlug)->get());
+        else $workoutExercises = new WorkoutExerciseCollection($user->workouts->firstWhere('id', $workoutSlug)->workoutExercises);
 
-        return $this->successResponse('List of workout exercises found', $workoutExercises);
+        return $this->successResponse("Workout exercises has been successfully found.", $workoutExercises);
     }
 
     /**
@@ -47,23 +40,23 @@ class WorkoutExerciseController extends Controller
         $user = auth()->user();
 
         // Check if workout exists
-        if ($user->tokenCan('admin')) $workout = Workout::find($workoutSlug);
+        if ($user->hasAdminPrivileges()) $workout = Workout::find($workoutSlug);
         else $workout = $user->workouts()->find($workoutSlug);
 
-        if (!$workout) return $this->errorResponse('Workout plan not found', 404);
+        if (!$workout) return $this->errorResponse("Workout not found.", 404);
 
         // Find exercise
-        $exercise = Exercise::find($request->exercise_id);
-        if (!$exercise) return $this->errorResponse('Exercise not found.', 404);
+        $exercise = Exercise::find($request->validated()['exercise_id']);
+        if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
 
-        if (!$exercise->is_public && $exercise->user_id !== auth()->user()->id && !auth()->user()->tokenCan('admin')) {
-            return $this->errorResponse('Exercise not available.', 404);
+        if (!$exercise->is_public && $exercise->user_id !== $user->id && !$user->hasAdminPrivileges()) {
+            return $this->errorResponse("Exercise not available.", 404);
         }
 
         // Check if exercise already exists in the workout
         $existingExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exercise->id])->first();
 
-        if ($existingExercise) return $this->errorResponse('Exercise already exists in the workout', 400);
+        if ($existingExercise) return $this->errorResponse("Exercise already exists in the workout.", 400);
 
         $workoutExercise = new WorkoutExerciseResource(WorkoutExercise::create($request->validated()));
 
@@ -83,9 +76,9 @@ class WorkoutExerciseController extends Controller
             ]);
         }
 
-        if (!$workoutExercise) return $this->errorResponse('An error occurred while adding the exercise to the plan, please try again later', 500);
+        if (!$workoutExercise) return $this->errorResponse("An error occurred while adding the exercise to the workout, try again later.", 500);
 
-        return $this->successResponse('Exercise has been added to the plan successfully', $workoutExercise);
+        return $this->successResponse("Exercise has been successfully added to the workout.", $workoutExercise);
     }
 
     /**
@@ -99,18 +92,12 @@ class WorkoutExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
-        else {
-            $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])
-            ->whereHas('workout', function ($query) {
-                $query->where('user_id', auth()->user()->id);
-            })
-            ->first();
-        }
+        if ($user->hasAdminPrivileges()) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
+        else $workoutExercise = $user->workouts->firstWhere('id', $workoutSlug)->workoutExercises->firstWhere('exercise_id', $exerciseSlug);
 
-        if (!$workoutExercise) return $this->errorResponse('Workout exercise not found', 404);
+        if (!$workoutExercise) return $this->errorResponse("Workout exercise not found.", 404);
 
-        return $this->successResponse('Workout exercise found', new WorkoutExerciseResource($workoutExercise));
+        return $this->successResponse("Workout exercise has been successfully found.", new WorkoutExerciseResource($workoutExercise));
     }
 
     /**
@@ -127,18 +114,12 @@ class WorkoutExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
-        else {
-            $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])
-            ->whereHas('workout', function ($query) {
-                $query->where('user_id', auth()->user()->id);
-            })
-            ->first();
-        }
+        if ($user->hasAdminPrivileges()) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
+        else $workoutExercise = $user->workouts->firstWhere('id', $workoutSlug)->workoutExercises->firstWhere('exercise_id', $exerciseSlug);
 
-        if (!$workoutExercise) return $this->errorResponse('Workout exercise not found', 404);
+        if (!$workoutExercise) return $this->errorResponse("Workout exercise not found.", 404);
 
-        if(!$workoutExercise->update($request->validated())) return $this->errorResponse('An error occurred while updating the workout exercise, please try again later', 500);
+        if(!$workoutExercise->update($request->validated())) return $this->errorResponse("An error occurred while updating the workout exercise, try again later.", 500);
 
         // Create entry in user exercise history
         $personalBest = UserExerciseHistory::where('exercise_id', $exerciseSlug)
@@ -156,7 +137,7 @@ class WorkoutExerciseController extends Controller
             ]);
         }
 
-        return $this->successResponse('Workout exercise has been successfully updated', new WorkoutExerciseResource($workoutExercise));
+        return $this->successResponse("Workout exercise has been successfully updated.", new WorkoutExerciseResource($workoutExercise));
     }
 
     /**
@@ -172,19 +153,13 @@ class WorkoutExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
-        else {
-            $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])
-            ->whereHas('workout', function ($query) {
-                $query->where('user_id', auth()->user()->id);
-            })
-            ->first();
-        }
+        if ($user->hasAdminPrivileges()) $workoutExercise = WorkoutExercise::where(['workout_id' => $workoutSlug, 'exercise_id' => $exerciseSlug])->first();
+        else $workoutExercise = $user->workouts->firstWhere('id', $workoutSlug)->workoutExercises->firstWhere('exercise_id', $exerciseSlug);
 
-        if (!$workoutExercise) return $this->errorResponse('Workout exercise not found', 404);
+        if (!$workoutExercise) return $this->errorResponse("Workout exercise not found.", 404);
 
-        if(!$workoutExercise->delete()) return $this->errorResponse('An error occurred while deleting the workout exercise, please try again later', 500);
+        if(!$workoutExercise->delete()) return $this->errorResponse("An error occurred while deleting the workout exercise, try again later.", 500);
 
-        return $this->successResponse('Workout exercise has been successfully deleted');
+        return $this->successResponse("Workout exercise has been successfully deleted.");
     }
 }

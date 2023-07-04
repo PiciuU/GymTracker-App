@@ -13,10 +13,6 @@ class WorkoutSeeder extends Seeder
      */
     public function run(): void
     {
-        for ($i = 0; $i < 5; $i += 1) {
-            Workout::factory()
-                ->count(1)
-                ->create();
-        }
+        Workout::factory()->count(5)->create();
     }
 }

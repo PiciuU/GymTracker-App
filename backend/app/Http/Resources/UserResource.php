@@ -14,22 +14,19 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($request->user() && $request->user()->hasAdminPrivileges()) {
-            return [
-                'id' => $this->id,
-                'login' => $this->login,
-                'name' => $this->name,
-                'email' => $this->email,
+        $fields = [
+            'id' => $this->id,
+            'login' => $this->login,
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+
+        if ($request->user()?->hasAdminPrivileges()) {
+            $fields += [
                 'user_role_id' => $this->user_role_id,
             ];
         }
-        else {
-            return [
-                'id' => $this->id,
-                'login' => $this->login,
-                'name' => $this->name,
-                'email' => $this->email,
-            ];
-        }
+
+        return $fields;
     }
 }

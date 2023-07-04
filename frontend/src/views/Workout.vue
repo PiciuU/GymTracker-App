@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container container-wrap">
         <SectionCard v-for="workout in dataStore.getWorkouts" :path="`workout/${workout.dayOfWeek.toLowerCase()}`" :image="`overlay/workout/${workout.dayOfWeek.toLowerCase()}`">
             {{ workout.dayOfWeek }}
         </SectionCard>
@@ -19,14 +19,5 @@
 
     const dataStore = useDataStore();
 
-    let isModalVisible = ref(false);
+    const isModalVisible = ref(false);
 </script>
-
-<style lang="scss" scoped>
-    @media screen and (min-width: $--breakpoint-large-devices) {
-        .container {
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-    }
-</style>

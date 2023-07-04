@@ -17,11 +17,9 @@ class WorkoutFactory extends Factory
      */
     public function definition(): array
     {
-        $user = User::doesntHave('workouts')->inRandomOrder()->first();
-
         return [
             'day_of_week' => $this->faker->numberBetween(1, 7),
-            'user_id' => $user->id,
+            'user_id' => User::doesntHave('workouts')->inRandomOrder()->first(),
         ];
     }
 }

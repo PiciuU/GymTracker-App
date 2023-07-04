@@ -32,23 +32,15 @@ class UserRequest extends FormRequest
     }
 
     /**
-     * Check if the user is an admin.
+     * Get the method name for the current request action.
      *
-     * @return bool
+     * @return string
      */
-    protected function hasAdminPrivileges(): bool
-    {
-        if ($this->user() && $this->user()->hasAdminPrivileges()) return true;
-
-        return false;
-    }
-
     protected function getMethodName(): string
     {
         $action = $this->route()->getActionMethod();
         return Str::camel($action);
     }
-
 
     /**
      * Get the validation rules that apply to the request.

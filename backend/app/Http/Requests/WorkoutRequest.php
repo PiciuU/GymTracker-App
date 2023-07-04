@@ -31,16 +31,6 @@ class WorkoutRequest extends FormRequest
     }
 
     /**
-     * Check if the user is an admin.
-     *
-     * @return bool
-     */
-    protected function hasAdminPrivileges(): bool
-    {
-        return $this->user()->tokenCan('admin');
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
@@ -72,10 +62,10 @@ class WorkoutRequest extends FormRequest
             'day_of_week' => ['required', 'integer', Rule::in([1,2,3,4,5,6,7])]
         ];
 
-        if ($this->hasAdminPrivileges()) {
-            $rules = array_merge($rules, [
+        if ($this->user()?->hasAdminPrivileges()) {
+            $rules += [
                 'user_id' => ['sometimes', 'required', 'integer', Rule::exists('users', 'id')]
-            ]);
+            ];
         }
 
         return $rules;
@@ -96,7 +86,7 @@ class WorkoutRequest extends FormRequest
             ]);
         }
 
-        if ($this->filed('dayOfWeek')) {
+        if ($this->filled('dayOfWeek')) {
             $this->merge([
                 'day_of_week' => $this->dayOfWeek
             ]);

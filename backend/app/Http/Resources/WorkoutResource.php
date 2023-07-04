@@ -25,19 +25,18 @@ class WorkoutResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fields = [
+            'id' => $this->id,
+            'dayOfWeek' => $this->daysMap[$this->day_of_week],
+            'exercises' => new WorkoutExerciseCollection($this->workoutExercises),
+        ];
+
         if ($request->user()->tokenCan('admin')) {
-            return [
-                'id' => $this->id,
-                'dayOfWeek' => $this->daysMap[$this->day_of_week],
-                'exercises' => new WorkoutExerciseCollection($this->workoutExercises),
+            $fields += [
                 'userId' => $this->user_id
-            ];
-        } else {
-            return [
-                'id' => $this->id,
-                'dayOfWeek' => $this->daysMap[$this->day_of_week]
             ];
         }
 
+        return $fields;
     }
 }

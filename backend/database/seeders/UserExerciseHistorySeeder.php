@@ -16,8 +16,6 @@ class UserExerciseHistorySeeder extends Seeder
      */
     public function run()
     {
-        UserExerciseHistory::factory()->create();
-
         $workouts = Workout::all();
 
         foreach ($workouts as $workout) {

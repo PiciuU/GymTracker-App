@@ -17,13 +17,9 @@ class WorkoutExerciseSeeder extends Seeder
         $workouts = Workout::all();
 
         foreach ($workouts as $workout) {
-            // Wygeneruj losową liczbę ćwiczeń od 1 do 5
             $exerciseCount = rand(1, 5);
 
-            // Utwórz i zapisz nowe połączenia treningu z ćwiczeniami
-            WorkoutExercise::factory()
-                ->count($exerciseCount)
-                ->create(['workout_id' => $workout->id]);
+            WorkoutExercise::factory()->count($exerciseCount)->create(['workout_id' => $workout->id]);
         }
     }
 }

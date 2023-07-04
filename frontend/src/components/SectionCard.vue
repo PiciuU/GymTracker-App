@@ -12,7 +12,7 @@
 
 <script setup>
     const props = defineProps({
-        path: { type: String, required: true, default: '/' },
+        path: { type: String, required: true, default: '' },
         image: { type: String, required: true, default: 'missing' }
     });
 

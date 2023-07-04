@@ -75,11 +75,11 @@ class UserExerciseHistoryRequest extends FormRequest
             'date' => ['date'],
         ];
 
-        if ($this->hasAdminPrivileges()) {
-            $rules = array_merge($rules, [
+        if ($this->user()?->hasAdminPrivileges()) {
+            $rules += [
                 'exercise_id' => ['sometimes', 'required', 'integer', Rule::exists('exercises', 'id')],
                 'user_id' => ['sometimes', 'required', 'integer', Rule::exists('users', 'id')],
-            ]);
+            ];
         }
 
         return $rules;

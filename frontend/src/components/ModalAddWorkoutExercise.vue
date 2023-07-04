@@ -81,7 +81,6 @@
     });
 
     const formData = reactive({
-        workoutId: props.workout.id,
         exerciseId: '',
         sets: null,
         reps: null,
@@ -115,7 +114,7 @@
     });
 
     const submitForm = () => {
-        dataStore.addWorkoutExercise(formData)
+        dataStore.addWorkoutExercise(props.workout.id, formData)
             .then(() => {
                 emit('close');
             })

@@ -107,6 +107,11 @@ export const router = createRouter({
                 },
             ]
         },
+        {
+            name: 'Error',
+            path: '/:catchAll(.*)',
+            component: () => import(/* webpackChunkName: "group-default" */ '@/layouts/Error.vue')
+        }
     ]
 })
 

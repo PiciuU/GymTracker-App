@@ -31,16 +31,6 @@ class WorkoutExerciseRequest extends FormRequest
     }
 
     /**
-     * Check if the user is an admin.
-     *
-     * @return bool
-     */
-    protected function hasAdminPrivileges(): bool
-    {
-        return $this->user()->tokenCan('admin');
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
@@ -79,11 +69,11 @@ class WorkoutExerciseRequest extends FormRequest
             'weight' => ['sometimes','nullable', 'numeric', 'regex:/^\d{0,6}(\.\d{1,2})?$/'],
         ];
 
-        if ($this->hasAdminPrivileges()) {
-            $rules = array_merge($rules, [
+        if ($this->user()?->hasAdminPrivileges()) {
+            $rules += [
                 'workout_id' => ['sometimes', 'required', 'integer', Rule::exists('workouts', 'id')],
                 'exercise_id' => ['sometimes', 'required', 'integer', Rule::exists('exercises', 'id')]
-            ]);
+            ];
         }
 
         return $rules;

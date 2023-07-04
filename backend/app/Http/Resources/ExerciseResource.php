@@ -15,30 +15,23 @@ class ExerciseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $fields = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'muscleGroup' => $this->muscle_group,
+            'thumbnailUrl' => $this->thumbnail_url,
+            'attachmentUrl' => $this->attachment_url,
+            'isPublic' => $this->is_public,
+        ];
+
         if ($request->user()->tokenCan('admin')) {
-            return [
-                'id' => $this->id,
-                'name' => $this->name,
-                'description' => $this->description,
-                'muscleGroup' => $this->muscle_group,
-                'thumbnailUrl' => $this->thumbnail_url,
-                'attachmentUrl' => $this->attachment_url,
+            $fields += [
                 'userId' => $this->user_id,
-                'isPublic' => $this->is_public,
                 'isApproved' => $this->is_approved
             ];
         }
-        else {
-            return [
-                'id' => $this->id,
-                'name' => $this->name,
-                'description' => $this->description,
-                'muscleGroup' => $this->muscle_group,
-                'thumbnailUrl' => $this->thumbnail_url,
-                'attachmentUrl' => $this->attachment_url,
-                'isPublic' => $this->is_public,
-                'isApproved' => $this->is_approved
-            ];
-        }
+
+        return $fields;
     }
 }

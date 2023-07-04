@@ -18,6 +18,14 @@
         <div class="modal__content" v-if="!editMode">
             <div class="content__group">
                 <div class="content__title">
+                    Name of exercise:
+                </div>
+                <div class="content__subtitle ">
+                    {{ exercise.name }}
+                </div>
+            </div>
+            <div class="content__group">
+                <div class="content__title">
                     Description:
                 </div>
                 <div class="content__subtitle  content__subtitle--sized">
@@ -196,6 +204,12 @@
     .modal__header .header__title {
         font-size: 2.5rem;
         letter-spacing: 0.2rem;
+        overflow: hidden;
+        padding: 0px 15px;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
     }
 
     .modal__header .header__subtitle {

@@ -18,6 +18,14 @@
         <div class="modal__content" v-if="!editMode">
             <div class="content__group">
                 <div class="content__title">
+                    Name of exercise:
+                </div>
+                <div class="content__subtitle ">
+                    {{ exercise.name }}
+                </div>
+            </div>
+            <div class="content__group">
+                <div class="content__title">
                     Description:
                 </div>
                 <div class="content__subtitle  content__subtitle--sized">
@@ -45,6 +53,13 @@
         </div>
         <div class="modal__content" v-else>
             <form class="form form--alternative" id="modalForm" @submit.prevent="submitForm">
+                <div class="form__group">
+                    <label for="name">Enter name of exercise: </label>
+                    <div class="form__input-group">
+                        <input type="text" id="name" v-model="formData.name" placeholder="Name" required/>
+                    </div>
+                </div>
+
                 <div class="form__group">
                     <label for="description">Enter description: </label>
                     <div class="form__input-group">
@@ -176,6 +191,7 @@
         editMode.value = status;
         if (status === true) {
             Object.assign(formData, {
+                name: props.exercise.name,
                 description: props.exercise.description,
                 muscleGroup: props.exercise.muscleGroup,
                 attachmentUrl: props.exercise.attachmentUrl,
@@ -228,6 +244,12 @@
     .modal__header .header__title {
         font-size: 2.5rem;
         letter-spacing: 0.2rem;
+        overflow: hidden;
+        padding: 0px 15px;
+        text-align: center;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%;
     }
 
     .modal__header .header__subtitle {

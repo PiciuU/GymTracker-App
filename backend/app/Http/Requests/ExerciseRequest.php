@@ -11,9 +11,9 @@ class ExerciseRequest extends FormRequest
 {
     const MUSCLE_GROUPS = [
         'Traps', 'Shoulders', 'Chest', 'Biceps', 'Forearms',
-        'Obliques', 'Abdominals', 'Quads', 'Calves', 'Lats',
-        'Triceps', 'Lower Back', 'Glutes', 'Hamstrings',
-        'Warmup', 'Full Body', 'Legs'
+        'Obliques', 'Abs', 'Quads', 'Calves', 'Lats',
+        'Triceps', 'Lower Back', 'Back', 'Glutes', 'Hamstrings',
+        'Warmup', 'Full Body', 'Legs', 'Arms',
     ];
 
     /**
@@ -35,16 +35,6 @@ class ExerciseRequest extends FormRequest
         throw (new ValidationException($validator, $response))
             ->errorBag($this->errorBag)
             ->redirectTo($this->getRedirectUrl());
-    }
-
-    /**
-     * Check if the user is an admin.
-     *
-     * @return bool
-     */
-    protected function hasAdminPrivileges(): bool
-    {
-        return $this->user()->tokenCan('admin');
     }
 
     /**
@@ -85,11 +75,11 @@ class ExerciseRequest extends FormRequest
             'is_public' => ['sometimes', 'integer', Rule::in([0,1])],
         ];
 
-        if ($this->hasAdminPrivileges()) {
-            $rules = array_merge($rules, [
+        if ($this->user()?->hasAdminPrivileges()) {
+            $rules += [
                 'user_id' => ['sometimes', 'required', 'integer'],
                 'is_approved' => ['sometimes', 'integer', Rule::in([0,1])]
-            ]);
+            ];
         }
 
         return $rules;

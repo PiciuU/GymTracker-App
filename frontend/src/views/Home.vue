@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container container-wrap">
         <SectionCard path="workout" image="overlay/workout">
             Workout
         </SectionCard>
@@ -17,12 +17,3 @@
 <script setup>
     import SectionCard from "@/components/SectionCard.vue";
 </script>
-
-<style lang="scss" scoped>
-    @media screen and (min-width: $--breakpoint-large-devices) {
-        .container {
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-    }
-</style>

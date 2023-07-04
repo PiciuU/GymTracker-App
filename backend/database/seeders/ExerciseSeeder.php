@@ -15,6 +15,6 @@ class ExerciseSeeder extends Seeder
      */
     public function run()
     {
-        Exercise::factory()->count(12)->public()->approved()->create();
+        Exercise::factory()->count(10)->public()->approved()->create();
     }
 }

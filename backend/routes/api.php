@@ -17,16 +17,11 @@ use App\Http\Controllers\FileController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => 'auth:sanctum'], function() {
 
     Route::group(['prefix' => 'auth'], function() {
         Route::get('users', [UserController::class, 'index']);
         Route::get('users/{id}', [UserController::class, 'show']);
-        Route::put('users/{id}', [UserController::class, 'update']);
 
         Route::get('user', [UserController::class, 'userData']);
         Route::put('user/name', [UserController::class, 'updateName']);
@@ -42,7 +37,6 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => 'auth:sanct
     Route::post('exercise/{id}/files/delete', [FileController::class, 'delete']);
 
     Route::apiResource('history', UserExerciseHistoryController::class);
-
     Route::apiResource('workout.exercise', WorkoutExerciseController::class);
 });
 

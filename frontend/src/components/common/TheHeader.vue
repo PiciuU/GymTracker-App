@@ -1,7 +1,7 @@
 <template>
     <header>
         <nav>
-            <router-link to="/" @click="handleAction">GymTracker</router-link>
+            <router-link to="/" @click="handleHomeAction">GymTracker</router-link>
             <font-awesome-icon icon="bars" @click="handleAction"/>
 
             <div class="menu" :class="{ 'menu--expanded': isExpanded }">
@@ -46,6 +46,10 @@
         isExpanded.value = !isExpanded.value;
         document.body.classList.toggle('disableScroll');
     };
+
+    const handleHomeAction = () => {
+        if (isExpanded.value == true) handleAction();
+    }
 
     const handleLogout = () => {
         handleAction();

@@ -1,5 +1,5 @@
 <template>
-    <div class="container" v-if="route.meta.calculatorType == 'bmi'">
+    <div class="container container-fixed" v-if="route.meta.calculatorType == 'bmi'">
         <h1>BMI Calculator</h1>
 
         <form class="form form--alternative" @submit.prevent="submitForm">
@@ -29,7 +29,7 @@
         </div>
     </div>
 
-    <div class="container" v-else>
+    <div class="container container-fixed" v-else>
         <h1>Calories Intake Calculator</h1>
 
         <form class="form form--alternative" @submit.prevent="submitForm">

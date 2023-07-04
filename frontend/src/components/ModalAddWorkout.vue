@@ -60,7 +60,7 @@
             return;
         }
 
-        dataStore.createWorkout(selectedDayOfWeek.value)
+        dataStore.createWorkout({ 'dayOfWeek': selectedDayOfWeek.value })
             .then(() => {
                 emit('close');
             })

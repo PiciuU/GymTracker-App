@@ -58,6 +58,20 @@
         width: 100%;
     }
 
+    @media screen and (min-width: $--breakpoint-large-devices) {
+        .container-wrap {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+    }
+
+    .container-fixed {
+        gap: 0;
+        margin: 0 auto;
+        max-width: 500px;
+        padding: 10px;
+    }
+
     .loader {
         &__wrapper {
             align-items: center;

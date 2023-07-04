@@ -17,14 +17,8 @@ class WorkoutExerciseResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        if ($this->rest_time === null) {
-            $formattedTime = null;
-        } else {
-            $seconds = $this->rest_time;
-            $minutes = floor($seconds / 60);
-            $seconds = $seconds % 60;
-            $formattedTime = sprintf('%02d:%02d', $minutes, $seconds);
-        }
+        if ($this->rest_time === null) $restTime = null;
+        else $restTime = gmdate('i:s', $this->rest_time);
 
         $personalBest = UserExerciseHistory::where('exercise_id', $this->exercise->id)
             ->where('user_id', auth()->user()->id)
@@ -40,7 +34,7 @@ class WorkoutExerciseResource extends JsonResource
             'attachmentUrl' => $this->exercise->attachment_url,
             'sets' => $this->sets,
             'reps' => $this->reps,
-            'restTime' => $formattedTime,
+            'restTime' => $restTime,
             'weight' => $this->weight,
             'personalBest' => $personalBest
         ];

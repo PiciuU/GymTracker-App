@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exercise;
-use Illuminate\Http\Request;
 use App\Http\Resources\ExerciseResource;
 use App\Http\Resources\ExerciseCollection;
 use App\Http\Requests\ExerciseRequest;
@@ -21,10 +20,10 @@ class ExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exercises = new ExerciseCollection(Exercise::all());
+        if ($user->hasAdminPrivileges()) $exercises = new ExerciseCollection(Exercise::all());
         else $exercises = new ExerciseCollection(Exercise::where('user_id', $user->id)->orWhere('is_public', true)->get());
 
-        return $this->successResponse('List of exercises found', $exercises);
+        return $this->successResponse("Exercises has been successfully found.", $exercises);
     }
 
     /**
@@ -37,9 +36,9 @@ class ExerciseController extends Controller
     {
         $exercise = new ExerciseResource(Exercise::create($request->validated()));
 
-        if (!$exercise) return $this->errorResponse('An error occurred while creating the exercise, please try again later', 500);
+        if (!$exercise) return $this->errorResponse("An error occurred while creating the exercise, please try again later.", 500);
 
-        return $this->successResponse('Exercise has been created successfully', $exercise);
+        return $this->successResponse("Exercise has been created successfully.", $exercise);
     }
 
     /**
@@ -55,15 +54,15 @@ class ExerciseController extends Controller
     {
         $exercise = Exercise::find($id);
 
-        if (!$exercise) return $this->errorResponse('Exercise not found.', 404);
+        if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
 
         $user = auth()->user();
 
-        if (!$exercise->is_public && $exercise->user_id !== $user->id && !$user->tokenCan('admin')) {
-            return $this->errorResponse('Exercise not available', 403);
+        if (!$exercise->is_public && $exercise->user_id !== $user->id && !$user->hasAdminPrivileges()) {
+            return $this->errorResponse("Exercise not available.", 403);
         }
 
-        return $this->successResponse('Exercise found', new ExerciseResource($exercise));
+        return $this->successResponse("Exercise has been successfully found.", new ExerciseResource($exercise));
     }
 
     /**
@@ -80,18 +79,18 @@ class ExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exercise = Exercise::find($id);
+        if ($user->hasAdminPrivileges()) $exercise = Exercise::find($id);
         else $exercise = $user->exercises()->find($id);
 
-        if (!$exercise) return $this->errorResponse('Exercise not found', 404);
+        if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
 
-        if ($exercise->is_public && $request->has('is_public') && !$user->tokenCan('admin')) {
-            return $this->errorResponse('You cannot change the visibility of a public exercise', 403);
+        if ($exercise->is_public && $request->has('is_public') && !$user->hasAdminPrivileges()) {
+            return $this->errorResponse("You cannot change the visibility of a public exercise.", 403);
         }
 
-        if(!$exercise->update($request->validated())) return $this->errorResponse('An error occurred while updating the exercise, please try again later', 500);
+        if(!$exercise->update($request->validated())) return $this->errorResponse("An error occurred while updating the exercise, please try again later.", 500);
 
-        return $this->successResponse('Exercise has been successfully updated', new ExerciseResource($exercise));
+        return $this->successResponse("Exercise has been successfully updated.", new ExerciseResource($exercise));
     }
 
     /**
@@ -106,15 +105,15 @@ class ExerciseController extends Controller
     {
         $user = auth()->user();
 
-        if ($user->tokenCan('admin')) $exercise = Exercise::find($id);
+        if ($user->hasAdminPrivileges()) $exercise = Exercise::find($id);
         else $exercise = $user->exercises()->find($id);
 
-        if (!$exercise) return $this->errorResponse('Exercise not found', 404);
+        if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
 
-        if ($exercise->workoutExercises()->exists()) return $this->errorResponse('You cannot delete an exercise that is added to someone\'s workout plan', 409);
+        if ($exercise->workoutExercises()->exists()) return $this->errorResponse("You cannot delete an exercise that is added to someone's workout plan.", 403);
 
-        if (!$exercise->delete()) return $this->errorResponse('An error occurred while deleting the exercise, please try again later', 500);
+        if (!$exercise->delete()) return $this->errorResponse("An error occurred while deleting the exercise, please try again later.", 500);
 
-        return $this->successResponse('Exercise has been successfully deleted');
+        return $this->successResponse("Exercise has been successfully deleted.");
     }
 }

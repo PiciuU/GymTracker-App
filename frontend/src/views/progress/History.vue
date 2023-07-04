@@ -105,8 +105,8 @@
         if (formData.exercise) {
             isFetching.value = true;
             dataStore.fetchExerciseHistory(formData.exercise.id)
-                .then((data) => {
-                    exerciseHistory.value = data;
+                .then((response) => {
+                    exerciseHistory.value = response.data;
                 })
                 .finally(() => {
                     isFetching.value = false;

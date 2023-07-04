@@ -46,17 +46,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    /**
-     * Get the workouts associated with the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-
-    public function isAdmin() {
+    public function isAdmin()
+    {
         return $this->userRole->name === 'Admin';
     }
 
-    public function hasAdminPrivileges() {
+    public function hasAdminPrivileges()
+    {
         return $this->tokenCan('admin') && $this->userRole->name === 'Admin';
     }
 

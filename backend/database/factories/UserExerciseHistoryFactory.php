@@ -19,8 +19,8 @@ class UserExerciseHistoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'exercise_id' => Exercise::factory(),
-            'user_id' => User::factory(),
+            'exercise_id' => Exercise::inRandomOrder()->first()->id,
+            'user_id' => User::inRandomOrder()->first()->id,
             'weight' => $this->faker->randomFloat(2, 20, 150),
             'date' => $this->faker->dateTimeBetween('-1 month', 'now')->format('Y-m-d'),
         ];

@@ -266,6 +266,8 @@ h1 {
 
 
     &__success {
+        width: 100%;
+
         p {
             color: $--color-success;
             text-align: center;
