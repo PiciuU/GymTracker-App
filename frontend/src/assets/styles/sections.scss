@@ -50,6 +50,10 @@
 
                 svg {
                     cursor: pointer;
+
+                    &.active {
+                        color: $--color-primary;
+                    }
                 }
             }
 
