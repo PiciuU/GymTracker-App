@@ -41,10 +41,10 @@ export const useDataStore = defineStore('dataStore', {
                 { id: 1, text: 'Monday' },
                 { id: 2, text: 'Tuesday' },
                 { id: 3, text: 'Wednesday' },
-              { id: 4, text: 'Thursday' },
-              { id: 5, text: 'Friday' },
-              { id: 6, text: 'Saturday' },
-              { id: 7, text: 'Sunday' },
+                { id: 4, text: 'Thursday' },
+                { id: 5, text: 'Friday' },
+                { id: 6, text: 'Saturday' },
+                { id: 7, text: 'Sunday' },
             ];
 
             const takenDays = workouts.map((workout) => workout.dayOfWeek);
@@ -106,7 +106,7 @@ export const useDataStore = defineStore('dataStore', {
             try {
                 this.loading = true;
                 const response = await ApiService.post(`/workout/${workoutId}/exercise`, payload);
-                const workout = this.workouts.find(w => w.id === payload.workoutId);
+                const workout = this.workouts.find(w => w.id === workoutId);
                 if (workout) workout.exercises.push(response.data);
                 return Promise.resolve();
             }

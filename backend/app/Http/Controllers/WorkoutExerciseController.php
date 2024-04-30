@@ -67,7 +67,7 @@ class WorkoutExerciseController extends Controller
             ->select('weight', 'date')
             ->first();
 
-        if (!$personalBest || $personalBest->weight < $workoutExercise->weight) {
+        if ($workoutExercise->weight && (!$personalBest || $personalBest->weight < $workoutExercise->weight)) {
             UserExerciseHistory::create([
                 'exercise_id' => $exercise->id,
                 'user_id' => $user->id,

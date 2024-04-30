@@ -84,7 +84,7 @@ class ExerciseController extends Controller
 
         if (!$exercise) return $this->errorResponse("Exercise not found.", 404);
 
-        if ($exercise->is_public && $request->has('is_public') && !$user->hasAdminPrivileges()) {
+        if ($exercise->is_public && $request->validated()['is_public'] == 0 && !$user->hasAdminPrivileges()) {
             return $this->errorResponse("You cannot change the visibility of a public exercise.", 403);
         }
 
