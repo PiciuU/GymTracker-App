@@ -27,6 +27,7 @@ class WorkoutExerciseResource extends JsonResource
             ->first();
 
         $fields = [
+            'id' => $this->exercise->id,
             'name' => $this->exercise->name,
             'description' => $this->exercise->description,
             'muscleGroup' => $this->exercise->muscle_group,
@@ -41,7 +42,6 @@ class WorkoutExerciseResource extends JsonResource
 
         if ($request->user()->tokenCan('admin')) {
             $fields += [
-                'id' => $this->exercise->id,
                 'userId' => $this->exercise->user_id,
                 'isApproved' => $this->exercise->is_approved,
                 'isPublic' => $this->exercise->is_public
